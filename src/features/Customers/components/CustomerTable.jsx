@@ -104,6 +104,9 @@ function CustomerTable() {
                     Order State
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Orders
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -142,7 +145,6 @@ function CustomerTable() {
                         {customer.phone}
                       </div>
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 flex items-center">
                         <MapPin className="w-4 h-4 mr-2 text-gray-400" />
@@ -155,9 +157,6 @@ function CustomerTable() {
                         <ShoppingCart className="w-4 h-4 mr-2 text-gray-400" />
                         {customer.totalOrders} orders
                       </div>
-                      {/* <div className="text-sm text-green-600 font-medium">
-                        ₹{customer.totalSpent.toLocaleString()}
-                      </div> */}
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -168,7 +167,6 @@ function CustomerTable() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
                         <button className="text-blue-600 hover:text-blue-900 p-1">
-                          <Eye className="w-4 h-4" />
                         </button>
                         <button className="text-green-600 hover:text-green-900 p-1">
                           <Edit className="w-4 h-4" />

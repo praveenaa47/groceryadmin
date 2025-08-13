@@ -18,7 +18,6 @@ function Customerfilter({ customers, onFilterChange }) {
     return matchesSearch && matchesFilter;
   });
   useEffect(() => {
-    // onFilterChange(filteredCustomers);
   }, [searchTerm, filterStatus, customers]);
 
   return (

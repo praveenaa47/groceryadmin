@@ -1,12 +1,14 @@
 import React from 'react'
 import Customerfilter from '../../../Customers/components/Customerfilter'
 
-function CouponFilter() {
+function DealFilter() {
   return (
     <div>
       <Customerfilter></Customerfilter>
+     
+      
     </div>
   )
 }
 
-export default CouponFilter
+export default DealFilter

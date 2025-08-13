@@ -1,6 +1,7 @@
-import React, { use, useState } from "react";
-import { Eye, EyeOff, Lock, Mail, Shield, Vegan } from "lucide-react";
+import React, { useState } from "react";
+import { Eye, EyeOff, Lock, Mail, Vegan } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { adminLogin } from "../api";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -8,11 +9,10 @@ function Login() {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e) => {
-    console.log("Login attempt:", formData);
-    alert("Login functionality would be implemented here");
-  };
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({
@@ -21,10 +21,29 @@ function Login() {
     });
   };
 
-  const navigate = useNavigate()
-  const handleLogin = ()=>{
-    navigate('/dashboard')
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
+
+    try {
+      const res = await adminLogin(formData.email, formData.password);
+      
+      // Store token in localStorage
+      localStorage.setItem("adminToken", res.token);
+      localStorage.setItem("adminInfo", JSON.stringify(res.admin));
+
+      // Navigate to dashboard
+      navigate("/dashboard");
+    } catch (error) {
+      setErrorMsg(
+        error.response?.data?.message || "Login failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -37,8 +56,14 @@ function Login() {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-yellow-100">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl shadow-xl p-8 border border-yellow-100"
+        >
           <div className="space-y-6">
+            {errorMsg && (
+              <p className="text-red-500 text-sm text-center">{errorMsg}</p>
+            )}
             <div>
               <label
                 htmlFor="email"
@@ -97,14 +122,14 @@ function Login() {
               </div>
             </div>
             <button
-              type="button"
-              onClick={handleLogin}
+              type="submit"
+              disabled={loading}
               className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2"
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

@@ -13,6 +13,16 @@ export const ROUTES = {
     CAROUSEL : "/carousel",
     SUBADMIN : "/sub-admins",
     ADDSUBADMIN : "/add-sub-admins",
+    ADDCOUPON : "/addcoupon",
+    DEALPAGE : "/dealpage",
+    ADDDEAL : "/add-dealpage",
+    ACCESSPERMISSION : "/access-permission",
+    HOMEOFFERADD : "/add-home-offer",
+    HOMEOFFER : "/home-offer",
+}
 
+export const BASE_URL = 'https://grocery-codeedex.onrender.com/api';
 
+export const API_ENDPOINTS = {
+    LOGIN: `${BASE_URL}/admin/auth/login`,
 }

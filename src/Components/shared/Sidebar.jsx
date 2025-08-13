@@ -26,6 +26,10 @@ import {
   CardSim,
   PersonStanding,
   WalletCards,
+  Clock,
+  PercentIcon,
+  UserCheck,
+  GitCompareArrows,
 } from "lucide-react";
 import { ROUTES } from "../../lib/constants";
 
@@ -83,16 +87,42 @@ const Sidebar = () => {
       icon: <WalletCards size={20} />,
       path: ROUTES.CAROUSEL,
     },
-      {
+  {
       name: "Sub Admins",
-      icon: <PersonStanding size={20} />,
-      path: ROUTES.SUBADMIN,
+      icon: <BoxIcon size={20} />,
+      isDropdown: true,
+      subItems: [
+        {
+          name: "Subadmins",
+          icon: <UserCheck size={18} />,
+          path: ROUTES.SUBADMIN,
+        },
+        {
+          name: "Permissions",
+          icon: <GitCompareArrows size={18} />,
+          path: ROUTES.ACCESSPERMISSION,
+        },
+      ]
     },
       {
       name: "Coupons",
       icon: <CardSim size={20} />,
       path: ROUTES.COUPONS,
     },
+    
+      {
+      name: "Time Offers",
+      icon: <Clock size={20} />,
+      path: ROUTES.DEALPAGE,
+    },
+    
+      {
+      name: "Home Offers",
+      icon: <PercentIcon size={20} />,
+      path: ROUTES.HOMEOFFER,
+    },
+    
+    
     
   ];
   const footerItems = [
@@ -105,6 +135,7 @@ const Sidebar = () => {
         localStorage.removeItem("adminToken");
       },
     },
+    
   ];
   const isActive = (path) => location.pathname === path;
   const isDropdownSectionActive = (subItems) => {

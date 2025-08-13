@@ -15,6 +15,12 @@ import CouponList from "./features/Coupons/Pages/CouponList";
 import SubAdminList from "./features/SubAdmin/Pages/SubAdminList";
 import AddSubAdmin from "./features/SubAdmin/Pages/AddSubAdmin";
 import CarouselList from "./features/Carousel/Pages/CarouselList";
+import AddCoupon from "./features/Coupons/Pages/AddCoupon";
+import DealPage from "./features/Dealoffer/Pages/DealPage";
+import AddDealofTheDay from "./features/Dealoffer/Pages/AddDealofTheDay";
+import SubAdminPermission from "./features/SubAdmin/Pages/SubAdminPermission";
+import HomeOffer from "./features/HomeOffer/Pages/HomeOffer";
+import AddHome from "./features/HomeOffer/Pages/AddHome";
 
 function App() {
   return (
@@ -30,8 +36,14 @@ function App() {
         <Route path={ROUTES.PRODUCT_SINGLE} element={<ProductSingleView />} />
         <Route path={ROUTES.COUPONS} element={<CouponList />} />
         <Route path={ROUTES.SUBADMIN} element={<SubAdminList />} />
+        <Route path={ROUTES.ACCESSPERMISSION} element={<SubAdminPermission />} />
         <Route path={ROUTES.ADDSUBADMIN} element={<AddSubAdmin />} />
         <Route path={ROUTES.CAROUSEL} element={<CarouselList />} />
+        <Route path={ROUTES.ADDCOUPON} element={<AddCoupon />} />
+        <Route path={ROUTES.DEALPAGE} element={<DealPage />} />
+        <Route path={ROUTES.ADDDEAL} element={<AddDealofTheDay />} />
+        <Route path={ROUTES.HOMEOFFER} element={<HomeOffer />} />
+        <Route path={ROUTES.HOMEOFFERADD} element={<AddHome />} />
       </Route>
       <Route path={ROUTES.LOGIN} element={<Login />} />
     </Routes>

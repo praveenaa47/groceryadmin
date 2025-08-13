@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, Upload, Camera } from "lucide-react";
+import { ChromePicker } from "react-color";
 
 export function AddModal({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ export function AddModal({ isOpen, onClose, onSave }) {
   });
   const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState({});
+  const [color, setColor] = useState("#ff0000");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -161,6 +163,12 @@ export function AddModal({ isOpen, onClose, onSave }) {
               {errors.image && (
                 <p className="mt-2 text-sm text-red-600">{errors.image}</p>
               )}
+            </div>
+            <div className="mb-6 flex justify-center">
+            <ChromePicker
+              color={color}
+              onChange={(updatedColor) => setColor(updatedColor.hex)}
+            />
             </div>
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <button
