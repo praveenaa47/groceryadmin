@@ -45,4 +45,5 @@ export const API_ENDPOINTS = {
     SUBADMIN : `${BASE_URL}/admin/sub-admin-management`,
     COUPONS : `${BASE_URL}/admin/coupon`,
     NOTIFICATION : `${BASE_URL}/admin/notification`,
+    HOMEGIF : `${BASE_URL}/admin/home-gif`,
 }

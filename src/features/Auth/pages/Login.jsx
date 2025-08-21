@@ -3,8 +3,6 @@ import { Eye, EyeOff, Lock, Mail, Vegan } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { adminLogin } from "../api";
 import { toast, Toaster } from "sonner";
-
-
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -13,38 +11,35 @@ function Login() {
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
   const navigate = useNavigate();
-
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMsg("");
-    setLoading(true);
-
-    try {
-      const res = await adminLogin(formData.email, formData.password);
-      localStorage.setItem("adminToken", res.token);
-      localStorage.setItem("adminInfo", JSON.stringify(res.admin));
-      toast.success("Login successful!");
-      setTimeout(() => {
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setErrorMsg("");
+  setLoading(true);
+  try {
+    const res = await adminLogin(formData.email, formData.password);
+    localStorage.setItem("adminToken", res.token);
+    localStorage.setItem("adminInfo", JSON.stringify(res.admin));
+    localStorage.setItem("adminRole", res.admin.role);
+    localStorage.setItem("adminPermissions", JSON.stringify(res.admin.permissions));
+    toast.success("Login successful!");
+    setTimeout(() => {
       navigate("/dashboard");
-      }, 1000);
-    } catch (error) {
-      setErrorMsg(
-        error.response?.data?.message || "Login failed. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
+    }, 1000);
+  } catch (error) {
+    setErrorMsg(
+      error.response?.data?.message || "Login failed. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -55,7 +50,6 @@ function Login() {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Panel</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
-
         {/* Login Form */}
         <form
           onSubmit={handleSubmit}
@@ -136,5 +130,4 @@ function Login() {
     </div>
   );
 }
-
 export default Login;

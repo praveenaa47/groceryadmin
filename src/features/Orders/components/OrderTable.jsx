@@ -244,7 +244,7 @@ function OrderTable() {
                           {order.totalItems} items
                         </div>
                         <div className="text-sm text-green-600 font-medium flex items-center mt-1">
-                          ₹{order.totalAmount.toLocaleString()}
+                          ₹{order?.totalAmount?.toLocaleString()}
                         </div>
                         {order.totalDiscount > 0 && (
                           <div className="text-xs text-red-600">

@@ -155,17 +155,7 @@ const HomeOfferView = () => {
                 {/* Content */}
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{offer.title}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">{offer.subtitle}</p>
-                    </div>
                     <div className="relative ml-2">
-                      <button
-                        onClick={() => setShowDropdown(showDropdown === offer.id ? null : offer.id)}
-                        className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                      >
-                        <MoreVertical className="w-4 h-4 text-gray-400" />
-                      </button>
                       
                       {showDropdown === offer.id && (
                         <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[140px]">
@@ -188,17 +178,6 @@ const HomeOfferView = () => {
                     </div>
                   </div>
 
-                  {/* Footer */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 border-t pt-3">
-                    <div className="flex items-center space-x-1">
-                      <Calendar className="w-3 h-3" />
-                      <span>{formatDate(offer.createdDate)}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Tag className="w-3 h-3" />
-                      <span>{offer.productsCount} products</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             ))}
