@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Eye,
   Edit,
@@ -9,85 +9,149 @@ import {
   ShoppingCart,
   MoreVertical,
 } from "lucide-react";
+import { deleteCustomer, getAllCustomer } from "../api";
+import { useNavigate } from "react-router-dom";
+import DeleteConfirmationModal from "../../../Components/shared/DeleteModal";
+import { toast, Toaster } from "sonner";
 
 function CustomerTable() {
-  const [customers, setCustomers] = useState([
-    {
-      userId: "6891f23b70ab5e244ee17e9e",
-      name: "John Doe",
-      email: "john.doe@email.com",
-      phone: "+91 9876543210",
-      location: "Mumbai, Maharashtra",
-      totalOrders: 24,
-      status: "Active",
-      avatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-    },
-    {
-      userId: "6891f23b70ab5e244ee17e9e",
-      name: "Mike Chen",
-      email: "mike.chen@email.com",
-      phone: "+91 7654321098",
-      location: "Bangalore, Karnataka",
-      totalOrders: 32,
-      status: "Active",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-    },
-    {
-      userId: "6891f23b70ab5e244ee17e9e",
-      name: "Emily Davis",
-      email: "emily.davis@email.com",
-      phone: "+91 6543210987",
-      location: "Chennai, Tamil Nadu",
-      totalOrders: 45,
-      status: "Inactive",
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-    },
-    {
-      userId: "6891f23b70ab5e244ee17e9e",
-      name: "David Wilson",
-      email: "david.w@email.com",
-      phone: "+91 5432109876",
-      location: "Pune, Maharashtra",
-      totalOrders: 8,
-      status: "Inactive",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-    },
-    {
-      userId: "6891f23b70ab5e244ee17e9e",
-      name: "Lisa Anderson",
-      email: "lisa.anderson@email.com",
-      phone: "+91 4321098765",
-      location: "Hyderabad, Telangana",
-      totalOrders: 28,
-      status: "Active",
-      avatar:
-        "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=40&h=40&fit=crop&crop=face",
-    },
-  ]);
-  const [filteredCustomers, setFilteredCustomers] = useState(customers);
+  const [customers, setCustomers] = useState([]);
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false); // Added missing state
+    
+  const navigate = useNavigate();
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (isVerified, status) => {
     const baseClasses =
       "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium";
-    switch (status) {
-      case "Active":
-        return `${baseClasses} bg-green-100 text-green-800`;
-      case "Premium":
-        return `${baseClasses} bg-purple-100 text-purple-800`;
-      case "Inactive":
-        return `${baseClasses} bg-red-100 text-red-800`;
-      default:
-        return `${baseClasses} bg-gray-100 text-gray-800`;
+
+    if (status === "active" && isVerified) {
+      return `${baseClasses} bg-green-100 text-green-800`;
+    } else if (status === "active" && !isVerified) {
+      return `${baseClasses} bg-yellow-100 text-yellow-800`;
+    } else {
+      return `${baseClasses} bg-red-100 text-red-800`;
     }
   };
 
+  const getStatusText = (isVerified, status) => {
+    if (status === "active" && isVerified) {
+      return "Active";
+    } else if (status === "active" && !isVerified) {
+      return "Pending";
+    } else {
+      return "Inactive";
+    }
+  };
+
+  // Fixed: Pass customer object instead of undefined 'category'
+  const handleDeleteClick = (customer) => {
+    setCustomerToDelete(customer);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!customerToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await deleteCustomer(customerToDelete.userId);
+      // Fixed: Filter by userId instead of undefined property
+      setCustomers((prev) =>
+        prev.filter((customer) => customer.userId !== customerToDelete.userId)
+      );
+      // Fixed: Update filtered customers as well
+      setFilteredCustomers((prev) =>
+        prev.filter((customer) => customer.userId !== customerToDelete.userId)
+      );
+      toast.success("Customer deleted successfully");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to delete customer";
+      toast.error(errorMessage);
+      // Removed fetchSubcategories() call as it's not relevant here
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+      setCustomerToDelete(null);
+    }
+  };
+
+  const transformApiData = (apiData) => {
+    return apiData.users.map((user) => ({
+      userId: user._id,
+      name: user.name,
+      email: user.email || "N/A",
+      phone: user.number,
+      location:
+        user.devices.length > 0 ? `IP: ${user.devices[0].ip}` : "Unknown",
+      totalOrders: 0,
+      status: getStatusText(user.isVerified, user.status),
+      isVerified: user.isVerified,
+      coins: user.coins,
+      referralCode: user.referralCode,
+      createdAt: new Date(user.createdAt).toLocaleDateString(),
+      lastLogin:
+        user.devices.length > 0
+          ? new Date(
+              user.devices[user.devices.length - 1].lastLogin
+            ).toLocaleDateString()
+          : "Never",
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        user.name
+      )}&background=random`,
+    }));
+  };
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllCustomer();
+        const transformedData = transformApiData(data);
+        setCustomers(transformedData);
+        setFilteredCustomers(transformedData);
+      } catch (error) {
+        console.error("Failed to fetch customers:", error);
+        toast.error("Failed to fetch customers");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
+  const handleview = (customerId) => {
+    navigate(`/customer-view/${customerId}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading customers...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className=" px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Customer Management
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Total Customers: {customers.length}
+          </p>
+        </div>
+
         <div className="bg-white rounded-lg shadow mb-6">
           {/* Customer Table */}
           <div className="overflow-x-auto">
@@ -101,13 +165,16 @@ function CustomerTable() {
                     Contact Info
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Order State
+                    IP Address
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total Orders
+                    Coins
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Joined
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -115,77 +182,121 @@ function CustomerTable() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCustomers.map((customer) => (
-                  <tr key={customer.userId} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <img
-                          className="h-10 w-10 rounded-full object-cover"
-                          src={customer.avatar}
-                          alt={customer.name}
-                        />
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {customer.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {customer.userId}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center">
-                        <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                        {customer.email}
-                      </div>
-                      <div className="text-sm text-gray-500 flex items-center mt-1">
-                        <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                        {customer.phone}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center">
-                        <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                        {customer.location}
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center">
-                        <ShoppingCart className="w-4 h-4 mr-2 text-gray-400" />
-                        {customer.totalOrders} orders
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={getStatusBadge(customer.status)}>
-                        {customer.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900 p-1">
-                        </button>
-                        <button className="text-green-600 hover:text-green-900 p-1">
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button className="text-red-600 hover:text-red-900 p-1">
-                          <Trash className="w-4 h-4" />
-                        </button>
-                        <button className="text-gray-600 hover:text-gray-900 p-1">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </div>
+                {filteredCustomers.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="7"
+                      className="px-6 py-12 text-center text-gray-500"
+                    >
+                      No customers found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredCustomers.map((customer) => (
+                    <tr key={customer.userId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <img
+                            className="h-10 w-10 rounded-full object-cover"
+                            src={customer.avatar}
+                            alt={customer.name}
+                          />
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {customer.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {customer.referralCode}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 flex items-center">
+                          <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                          {customer.email}
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center mt-1">
+                          <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                          {customer.phone}
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 flex items-center">
+                          <MapPin className="w-4 h-4 mr-2 text-gray-400" />
+                          {customer.location}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Last: {customer.lastLogin}
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 flex items-center">
+                          <ShoppingCart className="w-4 h-4 mr-2 text-gray-400" />
+                          {customer.coins} coins
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={getStatusBadge(
+                            customer.isVerified,
+                            customer.status
+                          )}
+                        >
+                          {customer.status}
+                        </span>
+                        {customer.isVerified && (
+                          <div className="text-xs text-green-600 mt-1">
+                            ✓ Verified
+                          </div>
+                        )}
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {customer.createdAt}
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => handleview(customer.userId)}
+                            className="text-blue-600 hover:text-blue-900 p-1"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(customer)}
+                            className="text-red-600 hover:text-red-900 p-1"
+                            title="Delete"
+                            disabled={isDeleting}
+                          >
+                            <Trash className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        itemName={customerToDelete?.name || "This Customer"}
+        isLoading={isDeleting}
+      />
+      
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

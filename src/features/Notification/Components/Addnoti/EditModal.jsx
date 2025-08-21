@@ -1,6 +1,6 @@
 import React from 'react'
 
-function AddPriceDetails() {
+function EditModal() {
   return (
     <div>
       
@@ -8,4 +8,4 @@ function AddPriceDetails() {
   )
 }
 
-export default AddPriceDetails
+export default EditModal

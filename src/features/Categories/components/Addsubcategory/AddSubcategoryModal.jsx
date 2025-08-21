@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { X, Upload, Camera } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { X, Upload, Camera, ChevronDown } from "lucide-react";
+import { addSubCategory, getAllCategory } from "../../api";
+import { toast, Toaster } from "sonner";
 
 export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -9,6 +11,9 @@ export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
   });
   const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState({});
+  const [mainCategories, setMainCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Fixed: was using array instead of boolean
+  const [isFetchingCategories, setIsFetchingCategories] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,11 +29,13 @@ export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Store the actual file object for FormData
+      setFormData((prev) => ({ ...prev, image: file }));
+      
+      // Create preview URL
       const reader = new FileReader();
       reader.onload = (event) => {
-        const imageUrl = event.target.result;
-        setFormData((prev) => ({ ...prev, image: imageUrl }));
-        setImagePreview(imageUrl);
+        setImagePreview(event.target.result);
       };
       reader.readAsDataURL(file);
     }
@@ -37,25 +44,61 @@ export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.mainCategory.trim()) {
-      newErrors.mainCategory = "Main category name is required";
+      newErrors.mainCategory = "Main category selection is required";
     }
     if (!formData.name.trim()) {
-      newErrors.name = "Category name is required";
+      newErrors.name = "Subcategory name is required";
     }
-    if (!formData.image.trim()) {
-      newErrors.image = "Category image is required";
+    if (!formData.image) {
+      newErrors.image = "Subcategory image is required";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      onSave({
-        ...formData,
-        id: Date.now(),
-      });
-      handleClose();
+      setIsLoading(true);
+      try {
+        const formDataToSend = new FormData();
+        formDataToSend.append('category', formData.mainCategory); // Changed from 'mainCategory' to 'category'
+        formDataToSend.append('name', formData.name);
+        formDataToSend.append('image', formData.image);
+        
+        const response = await addSubCategory(formDataToSend);
+        toast.success('Subcategory created successfully');
+        
+        // Fixed: API returns 'subcategory' (lowercase), not 'subCategory'
+        if (onSave && response.subcategory) {
+          onSave(response.subcategory);
+        }
+        handleClose();
+      } catch (error) {
+        console.error("Error adding subcategory:", error);
+        toast.error(error.response?.data?.message || "Error adding subcategory");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchMainCategories();
+    }
+  }, [isOpen]);
+
+  const fetchMainCategories = async () => {
+    setIsFetchingCategories(true);
+    try {
+      const response = await getAllCategory();
+      setMainCategories(response.data || response || []);
+    } catch (error) {
+      console.error("Error fetching main categories:", error);
+      toast.error("Failed to fetch main categories");
+      setMainCategories([]);
+    } finally {
+      setIsFetchingCategories(false);
     }
   };
 
@@ -82,7 +125,7 @@ export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-              Add New Category
+              Add New Subcategory
             </h2>
             <button
               onClick={handleClose}
@@ -93,36 +136,13 @@ export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
           </div>
 
           <div className="p-4 sm:p-6">
-            <div className="mb-6">
-              <label
-                htmlFor="mainCategory"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Main Category Name *
-              </label>
-              <input
-                type="text"
-                id="mainCategory"
-                name="mainCategory"
-                value={formData.mainCategory}
-                onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors ${
-                  errors.mainCategory ? "border-red-500" : "border-gray-300"
-                }`}
-                placeholder="Enter main category name"
-              />
-              {errors.mainCategory && (
-                <p className="mt-1 text-sm text-red-600">{errors.mainCategory}</p>
-              )}
-            </div>
-
-            {/* Category Name */}
+            {/* Subcategory Name */}
             <div className="mb-6">
               <label
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Sub Category Name *
+                Subcategory Name *
               </label>
               <input
                 type="text"
@@ -133,38 +153,66 @@ export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors ${
                   errors.name ? "border-red-500" : "border-gray-300"
                 }`}
-                placeholder="Enter category name"
+                placeholder="Enter subcategory name"
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
               )}
             </div>
 
+            {/* Main Category Selection */}
+            <div className="mb-6">
+              <label
+                htmlFor="mainCategory"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Main Category *
+              </label>
+              <div className="relative">
+                <select
+                  id="mainCategory"
+                  name="mainCategory"
+                  value={formData.mainCategory}
+                  onChange={handleInputChange}
+                  disabled={isFetchingCategories}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors appearance-none bg-white ${
+                    errors.mainCategory ? "border-red-500" : "border-gray-300"
+                  } ${isFetchingCategories ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                >
+                  <option value="">
+                    {isFetchingCategories ? "Loading..." : "Select main category"}
+                  </option>
+                  {mainCategories.map((category) => (
+                    <option key={category._id || category.id} value={category._id || category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
+              {errors.mainCategory && (
+                <p className="mt-1 text-sm text-red-600">{errors.mainCategory}</p>
+              )}
+            </div>
+
             {/* Category Image */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category Image *
+                Subcategory Image *
               </label>
-              <div className="mb-4">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = `https://via.placeholder.com/100x100/f3f4f6/6b7280?text=${
-                          formData.name.charAt(0) || "?"
-                        }`;
-                      }}
-                    />
-                  ) : (
-                    <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                  )}
-                </div>
+              <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
+                )}
               </div>
-              <div className="text-center">
-                <label htmlFor="imageUpload" className="block mt-2">
+              <div className="text-center mt-2">
+                <label htmlFor="imageUpload">
                   <div className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <Upload className="w-4 h-4 mr-2 text-gray-500" />
                     <span className="text-sm text-gray-700">Upload Image</span>
@@ -179,7 +227,7 @@ export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
                 </label>
               </div>
               {errors.image && (
-                <p className="mt-2 text-sm text-red-600">{errors.image}</p>
+                <p className="mt-1 text-sm text-red-600 text-center">{errors.image}</p>
               )}
             </div>
 
@@ -195,14 +243,23 @@ export function AddSubcategoryModal({ isOpen, onClose, onSave }) {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="w-full sm:flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors font-medium"
+                disabled={isLoading || isFetchingCategories}
+                className="w-full sm:flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                Add Sub Category
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creating...
+                  </>
+                ) : (
+                  'Add Subcategory'
+                )}
               </button>
             </div>
           </div>
         </div>
       </div>
+      <Toaster position="bottom-right" />
     </div>
   );
 }

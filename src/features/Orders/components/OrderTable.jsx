@@ -1,165 +1,131 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  ShoppingCart,
   Package,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Truck,
   Eye,
-  Download,
   Phone,
   MapPin,
   Calendar,
-  DollarSign,
   User,
-  MoreVertical,
 } from "lucide-react";
+import { getAllOrders } from "../api";
+import { toast, Toaster } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 function OrderTable() {
-  const orders = [
-    {
-      orderId: "ORD-001234",
-      customerName: "John Doe",
-      customerPhone: "+91 9876543210",
-      customerAddress: "123 Main St, Mumbai, Maharashtra",
-      orderDate: "2024-08-11",
-      deliveryDate: "2024-08-12",
-      totalItems: 8,
-      totalAmount: 1250.75,
-      status: "Delivered",
-      paymentStatus: "Paid",
-      paymentMethod: "COD",
-      items: [
-        { name: "Organic Honey Crisp Apples", quantity: 2, price: 299.98 },
-        { name: "Fresh Milk - 1L", quantity: 3, price: 180.00 },
-        { name: "Whole Wheat Bread", quantity: 1, price: 45.00 }
-      ]
-    },
-    {
-      orderId: "ORD-001235",
-      customerName: "Sarah Johnson",
-      customerPhone: "+91 8765432109",
-      customerAddress: "456 Oak Ave, Delhi, Delhi",
-      orderDate: "2024-08-11",
-      deliveryDate: "2024-08-13",
-      totalItems: 12,
-      totalAmount: 2150.50,
-      status: "Processing",
-      paymentStatus: "Paid",
-      paymentMethod: "Card",
-      items: [
-        { name: "Fresh Vegetables Bundle", quantity: 1, price: 450.00 },
-        { name: "Basmati Rice - 5kg", quantity: 2, price: 800.00 },
-        { name: "Cooking Oil - 1L", quantity: 1, price: 165.00 }
-      ]
-    },
-    {
-      orderId: "ORD-001236",
-      customerName: "Mike Chen",
-      customerPhone: "+91 7654321098",
-      customerAddress: "789 Pine St, Bangalore, Karnataka",
-      orderDate: "2024-08-10",
-      deliveryDate: "2024-08-12",
-      totalItems: 6,
-      totalAmount: 890.25,
-      status: "Shipped",
-      paymentStatus: "Paid",
-      paymentMethod: "UPI",
-      items: [
-        { name: "Fresh Chicken - 1kg", quantity: 1, price: 320.00 },
-        { name: "Onions - 2kg", quantity: 1, price: 80.00 },
-        { name: "Tomatoes - 1kg", quantity: 1, price: 60.00 }
-      ]
-    },
-    {
-      orderId: "ORD-001237",
-      customerName: "Emily Davis",
-      customerPhone: "+91 6543210987",
-      customerAddress: "321 Elm St, Chennai, Tamil Nadu",
-      orderDate: "2024-08-11",
-      deliveryDate: "2024-08-14",
-      totalItems: 15,
-      totalAmount: 3200.00,
-      status: "Pending",
-      paymentStatus: "Pending",
-      paymentMethod: "COD",
-      items: [
-        { name: "Grocery Combo Pack", quantity: 1, price: 1200.00 },
-        { name: "Fresh Fruits Basket", quantity: 2, price: 600.00 },
-        { name: "Dairy Products Bundle", quantity: 1, price: 450.00 }
-      ]
-    },
-    {
-      orderId: "ORD-001238",
-      customerName: "David Wilson",
-      customerPhone: "+91 5432109876",
-      customerAddress: "654 Maple Dr, Pune, Maharashtra",
-      orderDate: "2024-08-09",
-      deliveryDate: "2024-08-11",
-      totalItems: 4,
-      totalAmount: 675.50,
-      status: "Cancelled",
-      paymentStatus: "Refunded",
-      paymentMethod: "UPI",
-      items: [
-        { name: "Organic Vegetables", quantity: 2, price: 300.00 },
-        { name: "Fresh Eggs - 12pcs", quantity: 1, price: 120.00 },
-        { name: "Greek Yogurt", quantity: 2, price: 180.00 }
-      ]
-    },
-    {
-      orderId: "ORD-001239",
-      customerName: "Lisa Anderson",
-      customerPhone: "+91 4321098765",
-      customerAddress: "987 Cedar Ln, Hyderabad, Telangana",
-      orderDate: "2024-08-11",
-      deliveryDate: "2024-08-12",
-      totalItems: 10,
-      totalAmount: 1850.75,
-      status: "Out for Delivery",
-      paymentStatus: "Paid",
-      paymentMethod: "COD",
-      items: [
-        { name: "Fresh Meat Selection", quantity: 1, price: 650.00 },
-        { name: "Seasonal Fruits", quantity: 3, price: 420.00 },
-        { name: "Spices & Condiments", quantity: 1, price: 180.00 }
-      ]
-    },
-    {
-      orderId: "ORD-001240",
-      customerName: "Robert Taylor",
-      customerPhone: "+91 3210987654",
-      customerAddress: "147 Birch St, Kolkata, West Bengal",
-      orderDate: "2024-08-10",
-      deliveryDate: "2024-08-13",
-      totalItems: 7,
-      totalAmount: 1120.25,
-      status: "Processing",
-      paymentStatus: "Paid",
-      paymentMethod: "UPI",
-      items: [
-        { name: "Frozen Foods Pack", quantity: 2, price: 480.00 },
-        { name: "Beverages Bundle", quantity: 1, price: 250.00 },
-        { name: "Snacks Variety Pack", quantity: 1, price: 180.00 }
-      ]
-    }
-  ];
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const navigate = useNavigate()
+
+  const transformApiData = (apiData) => {
+    return apiData.map((order) => {
+      const getAddress = () => {
+        if (order.shippingAddress) {
+          const addr = order.shippingAddress;
+          const parts = [
+            addr.house || addr.address,
+            addr.street,
+            addr.city,
+            addr.state,
+            addr.postalCode,
+            addr.country
+          ].filter(part => part && part.trim() !== "");
+          return parts.join(", ");
+        }
+        if (order.address) {
+          const addr = order.address;
+          const parts = [
+            addr.addressLine,
+            addr.landmark,
+            addr.city,
+            addr.state,
+            addr.pincode
+          ].filter(part => part && part.trim() !== "");
+          return parts.join(", ");
+        }
+        return "Address not available";
+      };
+
+      const getPhone = () => {
+        if (order.shippingAddress?.phone) return order.shippingAddress.phone;
+        if (order.address?.phone) return `+91-${order.address.phone}`;
+        return "N/A";
+      };
+
+      const getName = () => {
+        if (order.user?.name) return order.user.name;
+        if (order.shippingAddress?.name) return order.shippingAddress.name;
+        if (order.address?.fullName) return order.address.fullName;
+        return "Guest User";
+      };
+
+      const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
+      const orderId = `ORD-${order._id.slice(-6).toUpperCase()}`;
+      const formattedItems = order.items.map(item => ({
+        name: `Product (${item.weight}${item.measurm})`,
+        quantity: item.quantity,
+        price: item.price * item.quantity,
+        weight: item.weight,
+        unit: item.measurm,
+        isCombo: item.isCombo
+      }));
+
+      return {
+        orderId: orderId,
+        originalId: order._id,
+        customerName: getName(),
+        customerPhone: getPhone(),
+        customerAddress: getAddress(),
+        orderDate: new Date(order.createdAt).toLocaleDateString('en-IN'),
+        deliveryDate: "TBD", // Not available in API response
+        totalItems: totalItems,
+        totalAmount: order.totalPrice,
+        totalDiscount: order.totalDiscount || 0,
+        status: order.status.charAt(0).toUpperCase() + order.status.slice(1),
+        paymentStatus: order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1),
+        paymentMethod: order.paymentMethod,
+        items: formattedItems,
+        userId: order.user?._id || null,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt
+      };
+    });
+  };
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllOrders();
+        console.log("API Response:", data); 
+        const transformedData = transformApiData(data);
+        setOrders(transformedData);
+        setFilteredOrders(transformedData);
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+        toast.error("Failed to fetch orders");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   const getStatusBadge = (status) => {
     const baseClasses = "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium";
-    switch (status) {
-      case "Delivered":
+    switch (status.toLowerCase()) {
+      case "delivered":
         return `${baseClasses} bg-green-100 text-green-800`;
-      case "Processing":
+      case "processing":
         return `${baseClasses} bg-blue-100 text-blue-800`;
-      case "Shipped":
+      case "shipped":
         return `${baseClasses} bg-yellow-100 text-yellow-800`;
-      case "Out for Delivery":
+      case "out for delivery":
         return `${baseClasses} bg-purple-100 text-purple-800`;
-      case "Pending":
+      case "pending":
         return `${baseClasses} bg-gray-100 text-gray-800`;
-      case "Cancelled":
+      case "cancelled":
         return `${baseClasses} bg-red-100 text-red-800`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800`;
@@ -168,43 +134,47 @@ function OrderTable() {
 
   const getPaymentStatusBadge = (status) => {
     const baseClasses = "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium";
-    switch (status) {
-      case "Paid":
+    switch (status.toLowerCase()) {
+      case "paid":
         return `${baseClasses} bg-green-100 text-green-800`;
-      case "Pending":
+      case "unpaid":
         return `${baseClasses} bg-yellow-100 text-yellow-800`;
-      case "Refunded":
+      case "pending":
+        return `${baseClasses} bg-yellow-100 text-yellow-800`;
+      case "refunded":
         return `${baseClasses} bg-blue-100 text-blue-800`;
-      case "Failed":
+      case "failed":
         return `${baseClasses} bg-red-100 text-red-800`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "Delivered":
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case "Processing":
-        return <Clock className="w-4 h-4 text-blue-600" />;
-      case "Shipped":
-        return <Truck className="w-4 h-4 text-yellow-600" />;
-      case "Out for Delivery":
-        return <Truck className="w-4 h-4 text-purple-600" />;
-      case "Pending":
-        return <Clock className="w-4 h-4 text-gray-600" />;
-      case "Cancelled":
-        return <XCircle className="w-4 h-4 text-red-600" />;
-      default:
-        return <Package className="w-4 h-4 text-gray-600" />;
-    }
+  const handleViewOrder = (orderId) => {
+    navigate(`/order-view/${orderId}`);
   };
+
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen ">    
-      <div className=" px-4 sm:px-6 lg:px-8 py-8">
-        {/* Orders Table */}
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        {/* <div className="mb-6">
+          <p className="text-gray-600 mt-2">Total Orders: {orders.length}</p>
+        </div> */}
+
         <div className="bg-white rounded-lg shadow">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -234,88 +204,99 @@ function OrderTable() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {orders.map((order) => (
-                  <tr key={order.orderId} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {getStatusIcon(order.status)}
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {order.orderId}
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center mt-1">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {order.orderDate}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center">
-                        <User className="w-4 h-4 mr-2 text-gray-400" />
-                        {order.customerName}
-                      </div>
-                      <div className="text-sm text-gray-500 flex items-center mt-1">
-                        <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                        {order.customerPhone}
-                      </div>
-                    </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center">
-                        {order.totalItems} items
-                      </div>
-                      <div className="text-sm text-green-600 font-medium flex items-center mt-1">
-                        ₹{order.totalAmount.toLocaleString()}
-                      </div>
-                    </td>
-                    
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 flex items-start">
-                        <MapPin className="w-4 h-4 mr-2 text-gray-400 mt-0.5 flex-shrink-0" />
-                        <div className="max-w-xs">
-                          {order.customerAddress}
-                        </div>
-                      </div>
-                      <div className="text-sm text-gray-500 flex items-center mt-2">
-                        <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                        Delivery: {order.deliveryDate}
-                      </div>
-                    </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={getStatusBadge(order.status)}>
-                        {order.status}
-                      </span>
-                    </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={getPaymentStatusBadge(order.paymentStatus)}>
-                        {order.paymentStatus}
-                      </span>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {order.paymentMethod}
-                      </div>
-                    </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900 p-1">
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button className="text-gray-600 hover:text-gray-900 p-1">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </div>
+                {filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+                      No orders found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredOrders.map((order) => (
+                    <tr key={order.originalId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-gray-900">
+                              {order.orderId}
+                            </div>
+                            <div className="text-sm text-gray-500 flex items-center mt-1">
+                              <Calendar className="w-4 h-4 mr-1" />
+                              {order.orderDate}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 flex items-center">
+                          <User className="w-4 h-4 mr-2 text-gray-400" />
+                          {order.customerName}
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center mt-1">
+                          <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                          {order.customerPhone}
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 flex items-center">
+                          <Package className="w-4 h-4 mr-2 text-gray-400" />
+                          {order.totalItems} items
+                        </div>
+                        <div className="text-sm text-green-600 font-medium flex items-center mt-1">
+                          ₹{order.totalAmount.toLocaleString()}
+                        </div>
+                        {order.totalDiscount > 0 && (
+                          <div className="text-xs text-red-600">
+                            -₹{order.totalDiscount}
+                          </div>
+                        )}
+                      </td>
+                      
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900 flex items-start">
+                          <MapPin className="w-4 h-4 mr-2 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <div className="max-w-xs">
+                            {order.customerAddress}
+                          </div>
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={getStatusBadge(order.status)}>
+                          {order.status}
+                        </span>
+                      </td>
+                      
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={getPaymentStatusBadge(order.paymentStatus)}>
+                          {order.paymentStatus}
+                        </span>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {order.paymentMethod}
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end space-x-2">
+                          <button 
+                            onClick={() => handleViewOrder(order.originalId)}
+                            className="text-blue-600 hover:text-blue-900 p-1"
+                            title="View Order Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      <Toaster position="top-right" richColors/>
     </div>
   );
 }

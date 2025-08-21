@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Users, Shield, Eye, EyeOff, Plus, X, ChevronDown, Check } from 'lucide-react';
+import { addSubadmin } from '../../api';
+import { toast, Toaster } from 'sonner';
 
 const AddAdmin = () => {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
     selectedPermissions: []
@@ -13,21 +16,19 @@ const AddAdmin = () => {
   const dropdownRef = useRef(null);
 
   const dashboardSections = [
-    { id: 'users', label: 'User Management', icon: '👥' },
-    { id: 'analytics', label: 'Analytics & Reports', icon: '📊' },
-    { id: 'content', label: 'Content Management', icon: '📝' },
-    { id: 'settings', label: 'System Settings', icon: '⚙️' },
-    { id: 'billing', label: 'Billing & Payments', icon: '💳' },
-    { id: 'support', label: 'Customer Support', icon: '🎧' },
-    { id: 'products', label: 'Product Management', icon: '📦' },
-    { id: 'orders', label: 'Order Management', icon: '🛒' },
-    { id: 'marketing', label: 'Marketing Tools', icon: '📢' },
-    { id: 'notifications', label: 'Notifications', icon: '🔔' },
-    { id: 'security', label: 'Security & Logs', icon: '🔐' },
-    { id: 'integration', label: 'API & Integrations', icon: '🔗' }
+    { id: 'Products', label: 'Products' },
+    { id: 'Main Category', label: 'Main Category' },
+    { id: 'Category', label: 'Category' },
+    { id: 'Sub Category', label: 'Sub Category' },
+    { id: 'Coupons', label: 'Coupons' },
+    { id: 'Carousels', label: 'Carousels' },
+    { id: 'Referral', label: 'Referral' },
+    { id: 'deals', label: 'Time deals' },
+    { id: 'Orders', label: 'Orders' },
+    { id: 'Home offers', label: 'Home offers' },
+    { id: 'Customers', label: 'Customers' },
   ];
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -58,26 +59,43 @@ const AddAdmin = () => {
     }));
   };
 
-  const handleSubmit = async () => {
-    if (!formData.email || !formData.password || formData.selectedPermissions.length === 0) {
-      alert('Please fill in all fields and select at least one permission.');
-      return;
-    }
+const handleSubmit = async () => {
+  setIsSubmitting(true);
 
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Creating sub-admin:', formData);
-      alert('Sub-admin created successfully!');
-      setFormData({
-        email: '',
-        password: '',
-        selectedPermissions: []
-      });
-      setIsSubmitting(false);
-    }, 1500);
-  };
+  try {
+    const requestData = new FormData();
+    requestData.append("name", formData.name.trim());
+    requestData.append("email", formData.email.trim());
+    requestData.append("password", formData.password);
+    const normalizedPermissions = formData.selectedPermissions.map(p =>
+      p.toLowerCase().replace(/\s+/g, "")
+    );
+    requestData.append("permissions", JSON.stringify(normalizedPermissions));
+    requestData.append("role", "subadmin");
+    const response = await addSubadmin(requestData);
+    toast.success("Sub-admin created successfully!");
+    console.log("Sub-admin created:", response);
+
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      selectedPermissions: []
+    });
+  } catch (error) {
+    console.error("Error creating sub-admin:", error);
+    if (error.response) {
+      toast.error(error.response.data?.message || "Failed to create sub-admin");
+    } else if (error.request) {
+      toast.error("Network error. Please check your connection and try again.");
+    } else {
+      toast.error("An unexpected error occurred. Please try again.");
+    }
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const removePermission = (sectionId) => {
     setFormData(prev => ({
@@ -92,15 +110,21 @@ const AddAdmin = () => {
     }
     if (formData.selectedPermissions.length === 1) {
       const section = dashboardSections.find(s => s.id === formData.selectedPermissions[0]);
-      return `${section?.icon} ${section?.label}`;
+      return section?.label || 'Unknown permission';
     }
     return `${formData.selectedPermissions.length} permissions selected`;
+  };
+
+  const isFormValid = () => {
+    return formData.name.trim() && 
+           formData.email.trim() && 
+           formData.password.trim() && 
+           formData.selectedPermissions.length > 0;
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center items-center mb-4">
             <h1 className="text-3xl font-bold text-gray-900">Add Sub Admin</h1>
@@ -109,8 +133,24 @@ const AddAdmin = () => {
 
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="space-y-8">
-            {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  placeholder="Enter full name"
+                  required
+                />
+              </div>
+
+              {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address *
@@ -127,7 +167,8 @@ const AddAdmin = () => {
                 />
               </div>
 
-              <div>
+              {/* Password Field */}
+              <div className="md:col-span-2">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                   Password *
                 </label>
@@ -139,8 +180,9 @@ const AddAdmin = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                    placeholder="Enter secure password"
+                    placeholder="Enter secure password (min. 6 characters)"
                     required
+                    minLength={6}
                   />
                   <button
                     type="button"
@@ -153,10 +195,10 @@ const AddAdmin = () => {
               </div>
             </div>
 
-            {/* Dashboard Permissions */}
+            {/* Permissions Section */}
             <div>
               <div className="flex items-center mb-4">
-                <Users className="h-5 w-5 text-gray-600 mr-2" />
+                <Shield className="h-5 w-5 text-gray-600 mr-2" />
                 <h3 className="text-lg font-semibold text-gray-900">Dashboard Permissions *</h3>
               </div>
               <div className="relative" ref={dropdownRef}>
@@ -185,7 +227,6 @@ const AddAdmin = () => {
                           }`}
                         >
                           <div className="flex items-center">
-                            <span className="text-lg mr-3">{section.icon}</span>
                             <span className={`font-medium ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
                               {section.label}
                             </span>
@@ -197,7 +238,6 @@ const AddAdmin = () => {
                       );
                     })}
                     
-                    {/* Select All / Clear All Options */}
                     <div className="border-t border-gray-100 p-2 bg-gray-50">
                       <div className="flex gap-2">
                         <button
@@ -225,8 +265,6 @@ const AddAdmin = () => {
                   </div>
                 )}
               </div>
-
-              {/* Selected Permissions Display */}
               {formData.selectedPermissions.length > 0 && (
                 <div className="mt-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">
@@ -240,7 +278,6 @@ const AddAdmin = () => {
                           key={permissionId}
                           className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
                         >
-                          <span className="mr-1">{section?.icon}</span>
                           {section?.label}
                           <button
                             type="button"
@@ -265,10 +302,10 @@ const AddAdmin = () => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isSubmitting || !formData.email || !formData.password || formData.selectedPermissions.length === 0}
+                disabled={isSubmitting || !isFormValid()}
                 className={`
                   flex items-center px-8 py-3 rounded-lg font-medium transition duration-200
-                  ${isSubmitting || !formData.email || !formData.password || formData.selectedPermissions.length === 0
+                  ${isSubmitting || !isFormValid()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                     : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-200'
                   }
@@ -290,6 +327,7 @@ const AddAdmin = () => {
           </div>
         </div>
       </div>
+      <Toaster position='top-right' richColors/>
     </div>
   );
 };

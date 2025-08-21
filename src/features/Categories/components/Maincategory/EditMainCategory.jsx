@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Upload, Camera, Palette } from "lucide-react";
 import { ChromePicker } from "react-color";
+import { BASE_URL } from "../../../../lib/constants";
 
-export function AddModal({ isOpen, onClose, onSave }) {
+
+export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
   const [formData, setFormData] = useState({
     name: "",
     image: "",
@@ -25,8 +27,22 @@ export function AddModal({ isOpen, onClose, onSave }) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
-
+    useEffect(() => {
+    if (initialData) {
+      setFormData({
+        name: initialData.name || "",
+        image: initialData.image || "",
+        imageFile: null,
+        primaryColor: initialData.primaryColor || "",
+        secondaryColor: initialData.secondaryColor || "",
+      });
+      setImagePreview(
+        initialData.image
+          ? `${BASE_URL}/uploads/${initialData.image}`
+          : ""
+      );
+    }
+  }, [initialData]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -34,15 +50,13 @@ export function AddModal({ isOpen, onClose, onSave }) {
       setFormData((prev) => ({ 
         ...prev, 
         imageFile: file,
-        image: "" // Clear URL when file is uploaded
+        image: "" 
       }));
       const reader = new FileReader();
       reader.onload = (event) => {
         setImagePreview(event.target.result);
       };
       reader.readAsDataURL(file);
-      
-      // Clear any existing image error
       if (errors.image) {
         setErrors((prev) => ({ ...prev, image: "" }));
       }
@@ -119,7 +133,7 @@ export function AddModal({ isOpen, onClose, onSave }) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-              Add New Category
+              Edit main category
             </h2>
             <button
               onClick={handleClose}

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, Vegan } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { adminLogin } from "../api";
+import { toast, Toaster } from "sonner";
+
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,13 +30,12 @@ function Login() {
 
     try {
       const res = await adminLogin(formData.email, formData.password);
-      
-      // Store token in localStorage
       localStorage.setItem("adminToken", res.token);
       localStorage.setItem("adminInfo", JSON.stringify(res.admin));
-
-      // Navigate to dashboard
+      toast.success("Login successful!");
+      setTimeout(() => {
       navigate("/dashboard");
+      }, 1000);
     } catch (error) {
       setErrorMsg(
         error.response?.data?.message || "Login failed. Please try again."
@@ -131,6 +132,7 @@ function Login() {
           </div>
         </form>
       </div>
+       <Toaster position="bottom-right" richColors closeButton />
     </div>
   );
 }

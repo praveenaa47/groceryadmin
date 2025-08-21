@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Save, ArrowLeft, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-import { addproduct, getbyCatid, getbyMainid, getMainCategories } from "../api";
+import { getbyCatid, getbyMainid, getMainCategories, updateproduct, viewbyIdproduct } from "../api";
 import { toast, Toaster } from "sonner";
-import ImageUploader from "../Components/AddProduct/ImageUploader";
-import WeightStockManager from "../Components/AddProduct/WeightStockManager";
-import ProductTags from "../Components/AddProduct/ProductTags";
-import CategoryDropdowns from "../Components/AddProduct/CategoryDropdown";
+import EditImageUploader from "../Components/EditProduct/EditImageUploader";
+import EditWeightStockManager from "../Components/EditProduct/EditWeightStockManage";
+import EditProductTags from "../Components/EditProduct/EditProductTag";
+import EditCategoryDropdowns from "../Components/EditProduct/EditCategoryDropdown";
+import { ROUTES } from "../../../lib/constants";
 
-function AddProduct() {
-  // Form data state
+function Editproduct() {
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -21,7 +23,6 @@ function AddProduct() {
     measurment: "kg",
   });
 
-  // Product flags state
   const [productFlags, setProductFlags] = useState({
     isAvailable: true,
     isOfferProduct: false,
@@ -29,28 +30,66 @@ function AddProduct() {
     isSeasonal: false,
   });
 
-  // Weights and stocks state
   const [weightsAndStocks, setWeightsAndStocks] = useState([
     { weight: "", measurm: "g", weight_price: "", quantity: "" }
   ]);
 
-  // Images state
   const [images, setImages] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
 
-  // Loading and status states
   const [loading, setLoading] = useState(false);
+  const [loadingProduct, setLoadingProduct] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Category data states
   const [mainCategories, setMainCategories] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [loadingSubCategories, setLoadingSubCategories] = useState(false);
+  const navigate=useNavigate()
 
-  // Fetch main categories on component mount
   useEffect(() => {
+    const fetchProductData = async () => {
+      try {
+        const product = await viewbyIdproduct(id);
+        
+        setFormData({
+          name: product.name,
+          description: product.description,
+          mainCategory: product.mainCategory._id,
+          category: product.category._id,
+          subCategory: product.subCategory._id,
+          price: product.price,
+          offerPrice: product.offerPrice,
+          discountPercentage: product.discountPercentage,
+          measurment: product.measurment,
+        });
+        setProductFlags({
+          isAvailable: product.isAvailable,
+          isOfferProduct: product.isOfferProduct,
+          isPopular: product.isPopular,
+          isSeasonal: product.isSeasonal,
+        });
+        setWeightsAndStocks(product.weightsAndStocks);
+        setExistingImages(product.images.map(img => ({ url: img, file: null })));
+        if (product.mainCategory._id) {
+          const categoriesData = await getbyMainid(product.mainCategory._id);
+          setCategories(categoriesData || []);     
+          if (product.category._id) {
+            const subCategoriesData = await getbyCatid(product.category._id);
+            setSubCategories(subCategoriesData || []);
+          }
+        }
+
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        toast.error("Failed to load product data");
+      } finally {
+        setLoadingProduct(false);
+      }
+    };
+
     const fetchMainCategories = async () => {
       try {
         const data = await getMainCategories();
@@ -60,8 +99,10 @@ function AddProduct() {
         toast.error("Failed to load main categories");
       }
     };
+
     fetchMainCategories();
-  }, []);
+    fetchProductData();
+  }, [id]);
 
   // Handle main category change
   const handleMainCategoryChange = async (e) => {
@@ -162,7 +203,7 @@ function AddProduct() {
     if (!formData.price || formData.price <= 0) return "Valid price is required";
     if (!formData.offerPrice || formData.offerPrice <= 0) return "Valid offer price is required";
     if (parseFloat(formData.offerPrice) >= parseFloat(formData.price)) return "Offer price must be less than original price";
-    if (images.length === 0) return "At least one product image is required";
+    if (images.length === 0 && existingImages.length === 0) return "At least one product image is required";
     
     for (let i = 0; i < weightsAndStocks.length; i++) {
       const item = weightsAndStocks[i];
@@ -175,71 +216,66 @@ function AddProduct() {
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
 
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
+  const validationError = validateForm();
+  if (validationError) {
+    setError(validationError);
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
-        formDataToSend.append(key, formData[key]);
-      });
-      Object.keys(productFlags).forEach(key => {
-        formDataToSend.append(key, productFlags[key]);
-      });
-      formDataToSend.append('weightsAndStocks', JSON.stringify(weightsAndStocks));
-      images.forEach((image, index) => {
-        formDataToSend.append('images', image.file);
-      });
+  try {
+    const formDataToSend = new FormData();
+   
+    
+    Object.keys(formData).forEach(key => {
+      formDataToSend.append(key, formData[key]);
+    });
+    
+    Object.keys(productFlags).forEach(key => {
+      formDataToSend.append(key, productFlags[key]);
+    });
+    
+    formDataToSend.append('weightsAndStocks', JSON.stringify(weightsAndStocks));
+    
+    images.forEach((image, index) => {
+      formDataToSend.append('images', image.file);
+    });
+    
+    existingImages.forEach((image, index) => {
+      if (image.url && !image.removed) {
+        formDataToSend.append('existingImages', image.url);
+      }
+    });
 
-      await addproduct(formDataToSend);
-      
-      setSuccess("Product added successfully!");
-      toast.success("Product added successfully");
-      
-      // Reset form
-      setFormData({
-        name: "",
-        description: "",
-        mainCategory: "",
-        category: "",
-        subCategory: "",
-        price: "",
-        offerPrice: "",
-        discountPercentage: 0,
-        measurment: "kg",
-      });
-      
-      setProductFlags({
-        isAvailable: true,
-        isOfferProduct: false,
-        isPopular: false,
-        isSeasonal: false,
-      });
-      setWeightsAndStocks([
-        { weight: "", measurm: "g", weight_price: "", quantity: "" }
-      ]);
-      setImages([]);
-      setCategories([]);
-      setSubCategories([]);
-      
-      setTimeout(() => setSuccess(""), 5000);
-    } catch (err) {
-      toast.error("Error adding product:", err);
-      setError(err.response?.data?.message || "Failed to add product. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    await updateproduct(id, formDataToSend);
+    
+    setSuccess("Product updated successfully!");
+    toast.success("Product updated successfully");
+    navigate(`${ROUTES.PRODUCT_LIST}`)
+    
+    setTimeout(() => setSuccess(""), 5000);
+  } catch (err) {
+    console.error("Error updating product:", err);
+    toast.error("Error updating product");
+    setError(err.response?.data?.message || "Failed to update product. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  if (loadingProduct) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -253,7 +289,7 @@ function AddProduct() {
               </button>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Add New Product
+                  Edit Product
                 </h1>
               </div>
             </div>
@@ -274,7 +310,7 @@ function AddProduct() {
                 ) : (
                   <Save className="w-4 h-4" />
                 )}
-                <span>{loading ? "Saving..." : "Save Product"}</span>
+                <span>{loading ? "Saving..." : "Save Changes"}</span>
               </button>
             </div>
           </div>
@@ -305,7 +341,13 @@ function AddProduct() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Image Uploader */}
           <div className="lg:col-span-1">
-            <ImageUploader images={images} setImages={setImages} required />
+            <EditImageUploader 
+              images={images} 
+              setImages={setImages} 
+              existingImages={existingImages}
+              setExistingImages={setExistingImages}
+              required 
+            />
           </div>
 
           {/* Right Column - Form Sections */}
@@ -329,7 +371,7 @@ function AddProduct() {
                   />
                 </div>
                 
-                <CategoryDropdowns
+                <EditCategoryDropdowns
                   mainCategories={mainCategories}
                   categories={categories}
                   subCategories={subCategories}
@@ -428,15 +470,11 @@ function AddProduct() {
                 </div>
               </div>
             </div>
-
-            {/* Weights and Stocks Section */}
-            <WeightStockManager
+            <EditWeightStockManager
               weightsAndStocks={weightsAndStocks}
               setWeightsAndStocks={setWeightsAndStocks}
             />
-
-            {/* Product Tags Section */}
-            <ProductTags
+            <EditProductTags
               productFlags={productFlags}
               toggleProductFlag={toggleProductFlag}
             />
@@ -448,4 +486,4 @@ function AddProduct() {
   );
 }
 
-export default AddProduct;
+export default Editproduct;

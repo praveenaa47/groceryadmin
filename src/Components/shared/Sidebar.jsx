@@ -30,6 +30,10 @@ import {
   PercentIcon,
   UserCheck,
   GitCompareArrows,
+  Coins,
+  CoinsIcon,
+  CodeIcon,
+  MessageCircle,
 } from "lucide-react";
 import { ROUTES } from "../../lib/constants";
 
@@ -87,22 +91,10 @@ const Sidebar = () => {
       icon: <WalletCards size={20} />,
       path: ROUTES.CAROUSEL,
     },
-  {
-      name: "Sub Admins",
-      icon: <BoxIcon size={20} />,
-      isDropdown: true,
-      subItems: [
-        {
-          name: "Subadmins",
-          icon: <UserCheck size={18} />,
-          path: ROUTES.SUBADMIN,
-        },
-        {
-          name: "Permissions",
-          icon: <GitCompareArrows size={18} />,
-          path: ROUTES.ACCESSPERMISSION,
-        },
-      ]
+      {
+      name: "Sub-Admin",
+      icon: <UserCheck size={20} />,
+      path: ROUTES.SUBADMIN,
     },
       {
       name: "Coupons",
@@ -121,11 +113,21 @@ const Sidebar = () => {
       icon: <PercentIcon size={20} />,
       path: ROUTES.HOMEOFFER,
     },
+      {
+      name: "Referal",
+      icon: <Coins size={20} />,
+      path: ROUTES.REFERAL,
+    },
     
     
     
   ];
   const footerItems = [
+    {
+      name: "Notifications",
+      icon: <MessageCircle size={20} />,
+      path: ROUTES.NOTIFICATION,
+    },
     {
       name: "Logout",
       icon: <LogOut size={20} />,

@@ -17,7 +17,7 @@ function CouponList() {
             <h1 className="text-2xl text-center font-bold text-gray-900">All Coupons</h1>
           </div>
           <button 
-          onClick={handleaddcoupon}
+          onClick={handleaddcoupon} 
           className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" />
             Add Coupon
