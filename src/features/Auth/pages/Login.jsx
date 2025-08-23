@@ -18,28 +18,31 @@ function Login() {
       [e.target.name]: e.target.value,
     });
   };
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setErrorMsg("");
-  setLoading(true);
-  try {
-    const res = await adminLogin(formData.email, formData.password);
-    localStorage.setItem("adminToken", res.token);
-    localStorage.setItem("adminInfo", JSON.stringify(res.admin));
-    localStorage.setItem("adminRole", res.admin.role);
-    localStorage.setItem("adminPermissions", JSON.stringify(res.admin.permissions));
-    toast.success("Login successful!");
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1000);
-  } catch (error) {
-    setErrorMsg(
-      error.response?.data?.message || "Login failed. Please try again."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
+    try {
+      const res = await adminLogin(formData.email, formData.password);
+      localStorage.setItem("adminToken", res.token);
+      localStorage.setItem("adminInfo", JSON.stringify(res.admin));
+      localStorage.setItem("adminRole", res.admin.role);
+      localStorage.setItem(
+        "adminPermissions",
+        JSON.stringify(res.admin.permissions)
+      );
+      toast.success("Login successful!");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
+    } catch (error) {
+      setErrorMsg(
+        error.response?.data?.message || "Login failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -50,7 +53,6 @@ function Login() {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Panel</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
-        {/* Login Form */}
         <form
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl shadow-xl p-8 border border-yellow-100"
@@ -126,7 +128,7 @@ function Login() {
           </div>
         </form>
       </div>
-       <Toaster position="bottom-right" richColors closeButton />
+      <Toaster position="bottom-right" richColors closeButton />
     </div>
   );
 }

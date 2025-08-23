@@ -16,13 +16,12 @@ import {
   Smartphone,
   Gift
 } from 'lucide-react';
-import { getCustomerbyId } from '../api'; // Import your API function
-
+import { getCustomerbyId } from '../api'; 
 const CustomerDetailPage = () => {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { id } = useParams(); // Get the customer ID from URL params
+  const { id } = useParams(); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,11 +29,8 @@ const CustomerDetailPage = () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // Call your actual API
         const data = await getCustomerbyId(id);
         setCustomer(data);
-        
       } catch (error) {
         console.error("Failed to fetch customer details:", error);
         setError("Failed to load customer details");
@@ -42,7 +38,6 @@ const CustomerDetailPage = () => {
         setLoading(false);
       }
     };
-
     if (id) {
       fetchCustomerDetails();
     } else {
@@ -84,7 +79,7 @@ const CustomerDetailPage = () => {
   };
 
   const handleGoBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1); 
   };
 
   if (loading) {
@@ -105,23 +100,14 @@ const CustomerDetailPage = () => {
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Customer Not Found</h2>
           <p className="text-gray-600 mb-4">{error || "The requested customer could not be found."}</p>
-          <button 
-            onClick={handleGoBack}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Go Back
-          </button>
         </div>
       </div>
     );
   }
-
   const { user, cart, wishlist } = customer;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
@@ -140,14 +126,11 @@ const CustomerDetailPage = () => {
           </div>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Profile Section */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
           <div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
             <div className="absolute inset-0 bg-yellow-200 bg-opacity-20"></div>
           </div>
-          
           <div className="relative px-6 pb-6">
             <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-6 -mt-16">
               <div className="relative">
@@ -159,7 +142,6 @@ const CustomerDetailPage = () => {
                   />
                 </div>
               </div>
-              
               <div className="mt-6 sm:mt-0 sm:flex-1 sm:min-w-0">
                 <div className="flex items-center space-x-3">
                   <h2 className="text-2xl font-bold text-gray-900 capitalize">{user.name}</h2>
@@ -183,7 +165,6 @@ const CustomerDetailPage = () => {
                     Joined {formatDate(user.createdAt)}
                   </span>
                 </div>
-                
                 <div className="mt-4">
                   <span className={getStatusBadge(user.status, user.isVerified)}>
                     <Shield className="h-4 w-4 mr-1" />
@@ -194,8 +175,6 @@ const CustomerDetailPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
@@ -208,7 +187,6 @@ const CustomerDetailPage = () => {
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -221,7 +199,6 @@ const CustomerDetailPage = () => {
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="p-2 bg-red-100 rounded-lg">
@@ -233,7 +210,6 @@ const CustomerDetailPage = () => {
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 rounded-lg">
@@ -246,46 +222,37 @@ const CustomerDetailPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Details Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
               <User className="h-5 w-5 mr-2" />
               Account Information
             </h3>
-            
             <div className="space-y-4">              
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Name</span>
                 <span className="text-sm text-gray-900 capitalize">{user.name}</span>
               </div>
-              
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Phone Number</span>
                 <span className="text-sm text-gray-900">{user.number}</span>
               </div>
-              
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Role</span>
                 <span className="text-sm text-gray-900 capitalize">{user.role}</span>
               </div>
-              
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Verification Status</span>
                 <span className={`text-sm ${user.isVerified ? 'text-green-600' : 'text-yellow-600'}`}>
                   {user.isVerified ? 'Verified' : 'Pending'}
                 </span>
               </div>
-              
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Account Status</span>
                 <span className="text-sm text-gray-900 capitalize">{user.status}</span>
               </div>
             </div>
           </div>
-
-          {/* Referral & Activity */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
               <Gift className="h-5 w-5 mr-2" />
@@ -299,24 +266,20 @@ const CustomerDetailPage = () => {
                   {user.referralCode}
                 </span>
               </div>
-              
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Referred By</span>
                 <span className="text-sm text-gray-900">
                   {user.referredBy || 'Direct signup'}
                 </span>
               </div>
-              
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Account Created</span>
                 <span className="text-sm text-gray-900">{formatDate(user.createdAt)}</span>
               </div>
-              
               <div className="flex justify-between py-3 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Last Updated</span>
                 <span className="text-sm text-gray-900">{formatDate(user.updatedAt)}</span>
               </div>
-              
               {user.otp && (
                 <div className="flex justify-between py-3 border-b border-gray-100">
                   <span className="text-sm font-medium text-gray-600">OTP Status</span>
@@ -328,8 +291,6 @@ const CustomerDetailPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Empty States for Cart and Wishlist */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
@@ -342,7 +303,6 @@ const CustomerDetailPage = () => {
               <p className="text-sm text-gray-400 mt-1">Total: ₹{cart.totalPrice}</p>
             </div>
           </div>
-
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
               <Heart className="h-5 w-5 mr-2" />

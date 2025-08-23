@@ -23,7 +23,6 @@ function Button({ onClick, icon: Icon, children, className = "" }) {
     </button>
   );
 }
-
 function InputField({
   type,
   placeholder,
@@ -69,7 +68,6 @@ export default function MainCategory() {
         setLoading(true);
         setError(null);
         const data = await getMainCategories();
-
         const transformedData = data.map((item) => ({
           id: item._id,
           name: item.name,
@@ -105,7 +103,6 @@ export default function MainCategory() {
   };
   const handleConfirmDelete = async () => {
     if (!categoryToDelete) return;
-
     try {
       setIsDeleting(true);
       await deleteMainCategories(categoryToDelete);
@@ -187,7 +184,6 @@ export default function MainCategory() {
       } else if (categoryData.image) {
         formData.append("imageUrl", categoryData.image);
       }
-
       const updated = await editMainCategories(categoryToEdit.id, formData);
 
       setCategories((prev) =>
@@ -203,7 +199,6 @@ export default function MainCategory() {
             : cat
         )
       );
-
       toast.success("Category updated successfully!");
       setIsEditModalOpen(false);
       setCategoryToEdit(null);
@@ -239,14 +234,13 @@ export default function MainCategory() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+      <div >
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Main Category
               </h1>
-              <p className="text-gray-600">Manage your product categories</p>
             </div>
             <Button onClick={handleAddCategory} icon={Plus}>
               Add Category
@@ -270,12 +264,6 @@ export default function MainCategory() {
         {loading && (
           <div className="flex justify-center items-center py-12">
             <div className="text-gray-500">Loading categories...</div>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="text-red-600">{error}</div>
           </div>
         )}
 
@@ -385,7 +373,6 @@ export default function MainCategory() {
         onSave={handleUpdateCategory}
         initialData={categoryToEdit}
       />
-
       <Toaster position="bottom-right" richColors closeButton />
     </div>
   );

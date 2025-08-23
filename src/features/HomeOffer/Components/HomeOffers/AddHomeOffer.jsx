@@ -1,67 +1,63 @@
 import React, { useState } from 'react';
-import { Upload, X, ChevronDown, Check } from 'lucide-react';
+import { Upload, X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { addHomeoffer } from '../../api';
+import { toast, Toaster } from 'sonner';
+
 
 const AddHomeOffer = () => {
   const [formData, setFormData] = useState({
-    title: '',
-    subtitle: '',
     backgroundImage: null,
-    gifFile: null,
-    selectedProducts: []
+    gifFile: null
   });
 
   const [errors, setErrors] = useState({});
-  const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false);
-
-  const products = [
-    { id: 1, name: 'Red Yummy Potato' },
-    { id: 2, name: 'Red Yummy Potato' },
-    { id: 3, name: 'Red Yummy Potato' },
-    { id: 4, name: 'Red Yummy Potato' },
-    { id: 5, name: 'Red Yummy Potato' },
-    { id: 6, name: 'Red Yummy Potato' },
-    { id: 7, name: 'Red Yummy Potato' },
-    { id: 8, name: 'Red Yummy Potato' },
-    { id: 9, name: 'Red Yummy Potato' },
-  ];
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error'
 
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
-    }
     
     if (!formData.backgroundImage) {
       newErrors.backgroundImage = 'Background image is required';
     }
     
-    if (formData.selectedProducts.length === 0) {
-      newErrors.selectedProducts = 'At least one product must be selected';
+    if (!formData.gifFile) {
+      newErrors.gifFile = 'GIF file is required';
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
   const handleFileUpload = (e, fileType) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file type
+      if (fileType === 'gifFile' && !file.type.includes('gif')) {
+        setErrors(prev => ({
+          ...prev,
+          [fileType]: 'Please select a valid GIF file'
+        }));
+        return;
+      }
+      
+      if (fileType === 'backgroundImage' && !file.type.includes('image')) {
+        setErrors(prev => ({
+          ...prev,
+          [fileType]: 'Please select a valid image file'
+        }));
+        return;
+      }
+      
+      // Validate file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors(prev => ({
+          ...prev,
+          [fileType]: 'File size must be less than 10MB'
+        }));
+        return;
+      }
+      
       setFormData(prev => ({
         ...prev,
         [fileType]: file
@@ -76,42 +72,44 @@ const AddHomeOffer = () => {
     }
   };
 
-  const handleProductSelect = (product) => {
-    const isSelected = formData.selectedProducts.some(p => p.id === product.id);
-    
-    if (isSelected) {
-      setFormData(prev => ({
-        ...prev,
-        selectedProducts: prev.selectedProducts.filter(p => p.id !== product.id)
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        selectedProducts: [...prev.selectedProducts, product]
-      }));
-    }
-    
-    if (errors.selectedProducts) {
-      setErrors(prev => ({
-        ...prev,
-        selectedProducts: ''
-      }));
-    }
-  };
-
-  const removeSelectedProduct = (productId) => {
-    setFormData(prev => ({
-      ...prev,
-      selectedProducts: prev.selectedProducts.filter(p => p.id !== productId)
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (validateForm()) {
-      console.log('Form submitted:', formData);
-      alert('Home offer created successfully!');
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    
+    try {
+      // Create FormData object
+      const formDataToSend = new FormData();
+      formDataToSend.append('backgroundImage', formData.backgroundImage);
+      formDataToSend.append('gif', formData.gifFile);
+      const response = await addHomeoffer(formDataToSend);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Form submitted:', {
+        backgroundImage: formData.backgroundImage.name,
+        gif: formData.gifFile.name
+      });
+      
+      setSubmitStatus('success');
+      toast.success("successfully added")
+      setTimeout(() => {
+        setFormData({
+          backgroundImage: null,
+          gifFile: null
+        });
+        setSubmitStatus(null);
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Failed to create home offer:', error);
+      toast.error('Failed to create home offer:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -120,208 +118,142 @@ const AddHomeOffer = () => {
       ...prev,
       [fileType]: null
     }));
+    
+    if (errors[fileType]) {
+      setErrors(prev => ({
+        ...prev,
+        [fileType]: ''
+      }));
+    }
+  };
+
+  const renderFileUpload = (fileType, label, acceptedTypes, isRequired = false) => {
+    const file = formData[fileType];
+    const error = errors[fileType];
+    
+    return (
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">
+          {label} {isRequired && <span className="text-red-500">*</span>}
+        </label>
+        <div className={`border-2 border-dashed rounded-lg p-4 transition-colors ${
+          error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+        }`}>
+          {file ? (
+            <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                  fileType === 'gifFile' ? 'bg-green-100' : 'bg-blue-100'
+                }`}>
+                  <Upload className={`w-5 h-5 ${
+                    fileType === 'gifFile' ? 'text-green-600' : 'text-blue-600'
+                  }`} />
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-900 block">{file.name}</span>
+                  <span className="text-xs text-gray-500">
+                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => removeFile(fileType)}
+                className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <Upload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+              <div className="text-sm text-gray-600">
+                <label className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
+                  Click to upload {label.toLowerCase()}
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept={acceptedTypes}
+                    onChange={(e) => handleFileUpload(e, fileType)}
+                  />
+                </label>
+                <span className="text-gray-400"> or drag & drop</span>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                {fileType === 'gifFile' ? 'GIF files only' : 'PNG, JPG, GIF'}, up to 10MB
+              </p>
+            </div>
+          )}
+        </div>
+        {error && <p className="text-red-500 text-sm flex items-center mt-1">
+          <AlertCircle className="w-4 h-4 mr-1" />
+          {error}
+        </p>}
+      </div>
+    );
   };
 
   return (
- <div className="min-h-screen ">
-      <div className="max-w-xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-2xl mx-auto px-4">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <form onSubmit={handleSubmit} className="p-6 ">
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                placeholder="Enter offer title..."
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
-                  errors.title ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.title && <p className="text-red-500 text-xs">{errors.title}</p>}
-            </div>
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">Add Home Offer</h2>
+            <p className="text-sm text-gray-600 mt-1">Upload background image and GIF for the home carousel</p>
+          </div>
+          
+          <div className="p-6 space-y-6">
+            {renderFileUpload('backgroundImage', 'Background Image', 'image/*', true)}
+            {renderFileUpload('gifFile', 'GIF File', 'image/gif', true)}
 
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">Subtitle</label>
-              <input
-                type="text"
-                name="subtitle"
-                value={formData.subtitle}
-                onChange={handleInputChange}
-                placeholder="Enter subtitle (optional)..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Background Image <span className="text-red-500">*</span>
-              </label>
-              <div className={`border-2 border-dashed rounded-lg p-3 ${
-                errors.backgroundImage ? 'border-red-500 bg-red-50' : 'border-gray-300'
-              }`}>
-                {formData.backgroundImage ? (
-                  <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                        <Upload className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <span className="text-sm text-gray-700 truncate">{formData.backgroundImage.name}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFile('backgroundImage')}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                    <div className="text-xs text-gray-600">
-                      <label className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
-                        Upload image
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={(e) => handleFileUpload(e, 'backgroundImage')}
-                        />
-                      </label>
-                      <span className="text-gray-400"> or drag & drop</span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
-                  </div>
-                )}
-              </div>
-              {errors.backgroundImage && <p className="text-red-500 text-xs">{errors.backgroundImage}</p>}
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">GIF File (Optional)</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-3">
-                {formData.gifFile ? (
-                  <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                        <Upload className="w-4 h-4 text-green-600" />
-                      </div>
-                      <span className="text-sm text-gray-700 truncate">{formData.gifFile.name}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFile('gifFile')}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                    <div className="text-xs text-gray-600">
-                      <label className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
-                        Upload GIF
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/gif"
-                          onChange={(e) => handleFileUpload(e, 'gifFile')}
-                        />
-                      </label>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">GIF only, up to 10MB</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Products <span className="text-red-500">*</span>
-              </label>
-              {formData.selectedProducts.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {formData.selectedProducts.map((product) => (
-                    <div
-                      key={product.id}
-                      className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs flex items-center space-x-1"
-                    >
-                      <span>{product.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeSelectedProduct(product.id)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
+            {submitStatus === 'success' && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                <div>
+                  <p className="text-green-800 font-medium">Home offer created successfully!</p>
+                  <p className="text-green-600 text-sm">Your carousel has been uploaded and is now active.</p>
                 </div>
-              )}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsProductDropdownOpen(!isProductDropdownOpen)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between text-sm ${
-                    errors.selectedProducts ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                >
-                  <span className="text-gray-700">
-                    {formData.selectedProducts.length > 0 
-                      ? `${formData.selectedProducts.length} products selected`
-                      : 'Select products...'
-                    }
-                  </span>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${
-                    isProductDropdownOpen ? 'rotate-180' : ''
-                  }`} />
-                </button>
-
-                {isProductDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                    {products.map((product) => {
-                      const isSelected = formData.selectedProducts.some(p => p.id === product.id);
-                      return (
-                        <div
-                          key={product.id}
-                          onClick={() => handleProductSelect(product)}
-                          className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${
-                            isSelected ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                          }`}
-                        >
-                          <span>{product.name}</span>
-                          {isSelected && <Check className="w-4 h-4 text-blue-600" />}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
               </div>
-              {errors.selectedProducts && <p className="text-red-500 text-xs">{errors.selectedProducts}</p>}
-            </div>
+            )}
 
+            {submitStatus === 'error' && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
+                <AlertCircle className="w-5 h-5 text-red-600 mr-3" />
+                <div>
+                  <p className="text-red-800 font-medium">Failed to create home offer</p>
+                  <p className="text-red-600 text-sm">Please try again or contact support if the issue persists.</p>
+                </div>
+              </div>
+            )}
+            
             <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
               <button
                 type="button"
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium"
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                disabled={isSubmitting}
               >
                 Cancel
               </button>
               <button
-                type="submit"
-                className="px-6 py-2  text-white rounded-lg bg-blue-500 text-sm font-medium shadow-md "
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting || (!formData.backgroundImage || !formData.gifFile)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center"
               >
-                Create Offer
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create Offer'
+                )}
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
+      <Toaster position='top-right' richColors />
     </div>
   );
 };

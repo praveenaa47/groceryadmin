@@ -21,7 +21,7 @@ function CustomerTable() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false); // Added missing state
-    
+
   const navigate = useNavigate();
 
   const getStatusBadge = (isVerified, status) => {
@@ -151,9 +151,7 @@ function CustomerTable() {
             Total Customers: {customers.length}
           </p>
         </div>
-
         <div className="bg-white rounded-lg shadow mb-6">
-          {/* Customer Table */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -211,7 +209,6 @@ function CustomerTable() {
                           </div>
                         </div>
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 flex items-center">
                           <Mail className="w-4 h-4 mr-2 text-gray-400" />
@@ -222,7 +219,6 @@ function CustomerTable() {
                           {customer.phone}
                         </div>
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 flex items-center">
                           <MapPin className="w-4 h-4 mr-2 text-gray-400" />
@@ -232,14 +228,12 @@ function CustomerTable() {
                           Last: {customer.lastLogin}
                         </div>
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 flex items-center">
                           <ShoppingCart className="w-4 h-4 mr-2 text-gray-400" />
                           {customer.coins} coins
                         </div>
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={getStatusBadge(
@@ -249,17 +243,15 @@ function CustomerTable() {
                         >
                           {customer.status}
                         </span>
-                        {customer.isVerified && (
+                        {/* {customer.isVerified && (
                           <div className="text-xs text-green-600 mt-1">
                             ✓ Verified
                           </div>
-                        )}
+                        )} */}
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {customer.createdAt}
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2">
                           <button
@@ -287,7 +279,6 @@ function CustomerTable() {
           </div>
         </div>
       </div>
-      
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -295,7 +286,6 @@ function CustomerTable() {
         itemName={customerToDelete?.name || "This Customer"}
         isLoading={isDeleting}
       />
-      
       <Toaster position="top-right" richColors />
     </div>
   );

@@ -107,16 +107,12 @@ export function AddModal({ isOpen, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
       <div
         className="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity"
         onClick={handleClose}
       ></div>
-
-      {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
         <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all">
-          {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
               Add New Category
@@ -128,9 +124,7 @@ export function AddModal({ isOpen, onClose, onSave }) {
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
-
           <div className="p-4 sm:p-6">
-            {/* Category Name */}
             <div className="mb-6">
               <label
                 htmlFor="name"
@@ -177,7 +171,6 @@ export function AddModal({ isOpen, onClose, onSave }) {
                   )}
                 </div>
               </div>
-              {/* File Upload */}
               <div className="text-center">
                 <label htmlFor="imageUpload" className="block">
                   <div className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
@@ -197,14 +190,10 @@ export function AddModal({ isOpen, onClose, onSave }) {
                 <p className="mt-2 text-sm text-red-600">{errors.icon}</p>
               )}
             </div>
-
-            {/* Color Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-4">
                 Category Colors
               </label>
-              
-              {/* Primary Color */}
               <div className="mb-4">
                 <label className="block text-xs font-medium text-gray-600 mb-2">
                   Primary Color
@@ -249,8 +238,6 @@ export function AddModal({ isOpen, onClose, onSave }) {
                   )}
                 </div>
               </div>
-
-              {/* Secondary Color */}
               <div className="mb-4">
                 <label className="block text-xs font-medium text-gray-600 mb-2">
                   Secondary Color
@@ -283,7 +270,6 @@ export function AddModal({ isOpen, onClose, onSave }) {
                       <Palette className="w-4 h-4 text-gray-500" />
                     </button>
                   </div>
-                  
                   {showSecondaryPicker && (
                     <div className="absolute top-12 left-0 z-10 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
                       <ChromePicker
@@ -295,8 +281,6 @@ export function AddModal({ isOpen, onClose, onSave }) {
                   )}
                 </div>
               </div>
-
-              {/* Color Preview */}
               <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50">
                 <p className="text-xs text-gray-600 mb-2">Color Preview:</p>
                 <div className="flex gap-2">
@@ -317,8 +301,6 @@ export function AddModal({ isOpen, onClose, onSave }) {
                 </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <button
                 type="button"

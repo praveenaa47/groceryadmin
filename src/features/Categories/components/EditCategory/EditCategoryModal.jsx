@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Upload, Camera, ChevronDown } from "lucide-react";
 import { updateCategory, getMainCategories } from "../../api";
-import { toast } from "sonner";
+import { toast, Toaster,  } from "sonner";
 
 export function EditCategoryModal({ isOpen, onClose, onSave, categoryToEdit }) {
   const [formData, setFormData] = useState({
@@ -105,7 +105,6 @@ export function EditCategoryModal({ isOpen, onClose, onSave, categoryToEdit }) {
           formDataToSend
         );
         toast.success("Category updated successfully");
-        console.log("Category updated:", response);        
         if (onSave && response.category) {
           onSave(response.category);
         }
@@ -131,7 +130,6 @@ export function EditCategoryModal({ isOpen, onClose, onSave, categoryToEdit }) {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
       <div
         className="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity"
         onClick={handleClose}
@@ -151,7 +149,6 @@ export function EditCategoryModal({ isOpen, onClose, onSave, categoryToEdit }) {
           </div>
 
           <div className="p-4 sm:p-6">
-            {/* Category Name */}
             <div className="mb-6">
               <label
                 htmlFor="name"
@@ -218,7 +215,6 @@ export function EditCategoryModal({ isOpen, onClose, onSave, categoryToEdit }) {
                 </p>
               )}
             </div>
-            {/* Category Image */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category Image
@@ -295,6 +291,7 @@ export function EditCategoryModal({ isOpen, onClose, onSave, categoryToEdit }) {
           </div>
         </div>
       </div>
+      <Toaster position="top-right" richColors/>
     </div>
   );
 }

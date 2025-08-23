@@ -130,7 +130,6 @@ const handleSubmit = async () => {
             <h1 className="text-3xl font-bold text-gray-900">Add Sub Admin</h1>
           </div>
         </div>
-
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -149,8 +148,6 @@ const handleSubmit = async () => {
                   required
                 />
               </div>
-
-              {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address *
@@ -167,7 +164,6 @@ const handleSubmit = async () => {
                 />
               </div>
 
-              {/* Password Field */}
               <div className="md:col-span-2">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                   Password *
@@ -194,8 +190,6 @@ const handleSubmit = async () => {
                 </div>
               </div>
             </div>
-
-            {/* Permissions Section */}
             <div>
               <div className="flex items-center mb-4">
                 <Shield className="h-5 w-5 text-gray-600 mr-2" />

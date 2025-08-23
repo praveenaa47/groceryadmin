@@ -29,6 +29,10 @@ import OrderView from "./features/Orders/pages/OrderView";
 import EditSubadmin from "./features/SubAdmin/Pages/EditSubadmin";
 import CouponEdit from "./features/Coupons/Pages/CouponEdit";
 import ViewNotification from "./features/Notification/Pages/ViewNotification";
+import DeliveryFeeManage from "./features/Delivery/Pages/DeliveryFeeManage";
+import HomesectionView from "./features/HomeSection/Pages/HomesectionView";
+import ComboOfferView from "./features/ComboOffer/Pages/ComboOfferView";
+import ActivityLogsTable from "./features/SubAdmin/Pages/ActivityLogsTable";
 
 function App() {
   return (
@@ -60,6 +64,10 @@ function App() {
         <Route path={ROUTES.HOMEOFFERADD} element={<AddHome />} />
         <Route path={ROUTES.REFERAL} element={<ReferralPointsManager />} />
         <Route path={ROUTES.NOTIFICATION} element={<ViewNotification />} />
+        <Route path={ROUTES.DELIVERYFEE} element={<DeliveryFeeManage />} />
+        <Route path={ROUTES.HOMESECTION} element={<HomesectionView />} />
+        <Route path={ROUTES.COMBO_OFFER} element={<ComboOfferView />} />
+        <Route path={ROUTES.SUBADMINACTIVITIES} element={<ActivityLogsTable />} />
       </Route>
       <Route path={ROUTES.LOGIN} element={<Login />} />
     </Routes>

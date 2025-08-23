@@ -3,7 +3,6 @@ import { X, Upload, Camera, ChevronDown } from "lucide-react";
 import { addCategory, getMainCategories } from "../../api";
 import { toast, Toaster } from "sonner";
 
-
 export function AddCategoryModal({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
     mainCategory: "",
@@ -13,9 +12,9 @@ export function AddCategoryModal({ isOpen, onClose, onSave }) {
   const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-   const [mainCategories, setMainCategories] = useState([]);
-    const [isFetchingCategories, setIsFetchingCategories] = useState(false);
-useEffect(() => {
+  const [mainCategories, setMainCategories] = useState([]);
+  const [isFetchingCategories, setIsFetchingCategories] = useState(false);
+  useEffect(() => {
     if (isOpen) {
       fetchMainCategories();
     }
@@ -46,7 +45,7 @@ useEffect(() => {
     }
   };
 
- const handleImageUpload = (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
@@ -87,11 +86,11 @@ useEffect(() => {
       setIsLoading(true);
       try {
         const formDataToSend = new FormData();
-        formDataToSend.append('mainCategory', formData.mainCategory);
-        formDataToSend.append('name', formData.name);
-        formDataToSend.append('image', formData.image);
+        formDataToSend.append("mainCategory", formData.mainCategory);
+        formDataToSend.append("name", formData.name);
+        formDataToSend.append("image", formData.image);
         const response = await addCategory(formDataToSend);
-        toast.success('Category created successfully');
+        toast.success("Category created successfully");
         if (onSave && response.category) {
           onSave(response.category);
         }
@@ -116,15 +115,12 @@ useEffect(() => {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
       <div
         className="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity"
         onClick={handleClose}
       ></div>
-      {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
         <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all">
-          {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
               Add New Category
@@ -143,7 +139,7 @@ useEffect(() => {
                 htmlFor="mainCategory"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                 Category Name *
+                Category Name *
               </label>
               <input
                 type="text"
@@ -160,8 +156,6 @@ useEffect(() => {
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
               )}
             </div>
-
-            {/* Category Name */}
             <div className="mb-6">
               <label
                 htmlFor="name"
@@ -178,13 +172,22 @@ useEffect(() => {
                   disabled={isFetchingCategories}
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors appearance-none bg-white ${
                     errors.mainCategory ? "border-red-500" : "border-gray-300"
-                  } ${isFetchingCategories ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                  } ${
+                    isFetchingCategories
+                      ? "cursor-not-allowed opacity-50"
+                      : "cursor-pointer"
+                  }`}
                 >
-                    <option value="">
-                    {isFetchingCategories ? "Loading..." : "Select main category"}
+                  <option value="">
+                    {isFetchingCategories
+                      ? "Loading..."
+                      : "Select main category"}
                   </option>
                   {mainCategories.map((category) => (
-                    <option key={category._id || category.id} value={category._id || category.id}>
+                    <option
+                      key={category._id || category.id}
+                      value={category._id || category.id}
+                    >
                       {category.name}
                     </option>
                   ))}
@@ -192,11 +195,12 @@ useEffect(() => {
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
               {errors.mainCategory && (
-                <p className="mt-1 text-sm text-red-600">{errors.mainCategory}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.mainCategory}
+                </p>
               )}
             </div>
 
-            {/* Category Image */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category Image *
@@ -238,8 +242,6 @@ useEffect(() => {
                 <p className="mt-2 text-sm text-red-600">{errors.image}</p>
               )}
             </div>
-
-            {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <button
                 type="button"
@@ -249,19 +251,19 @@ useEffect(() => {
               >
                 Cancel
               </button>
-             <button
+              <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={isLoading || isFetchingCategories}
                 className="w-full sm:flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-               {isLoading ? (
+                {isLoading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Creating...
                   </>
                 ) : (
-                  'Add Category'
+                  "Add Category"
                 )}
               </button>
             </div>

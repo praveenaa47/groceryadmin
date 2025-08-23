@@ -129,7 +129,6 @@ export function EditSubcategoryModal({ isOpen, onClose, onSave, categoryToEdit }
         className="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity"
         onClick={handleClose}
       ></div>
-      
       <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
         <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all">
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">

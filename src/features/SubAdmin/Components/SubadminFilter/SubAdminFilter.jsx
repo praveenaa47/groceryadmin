@@ -11,7 +11,6 @@ const SubAdminFilter = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row gap-4 flex-1">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -36,8 +35,6 @@ const SubAdminFilter = ({
             </select>
           </div>
         </div>
-
-        {/* Add Button */}
         <button
           onClick={onAdd}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 shadow-sm"

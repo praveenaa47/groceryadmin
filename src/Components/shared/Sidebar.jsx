@@ -34,6 +34,9 @@ import {
   CoinsIcon,
   CodeIcon,
   MessageCircle,
+  Bike,
+  FerrisWheel,
+  CombineIcon,
 } from "lucide-react";
 import { ROUTES } from "../../lib/constants";
 const Sidebar = () => {
@@ -58,13 +61,13 @@ const Sidebar = () => {
       name: "Dashboard",
       icon: <LayoutDashboard size={20} />,
       path: ROUTES.DASHBOARD,
-      permission: "dashboard"
+      permission: "dashboard",
     },
     {
       name: "Products",
       icon: <Grid2X2XIcon size={20} />,
       path: ROUTES.PRODUCT_LIST,
-      permission: "products"
+      permission: "products",
     },
     {
       name: "Categories",
@@ -76,69 +79,96 @@ const Sidebar = () => {
           name: "Main Categories",
           icon: <TorusIcon size={18} />,
           path: ROUTES.MAINCATEGORY,
-          permission: "categories"
+          permission: "categories",
         },
         {
           name: "Categories",
           icon: <ChefHatIcon size={18} />,
           path: ROUTES.CATEGORY,
-          permission: "categories"
+          permission: "categories",
         },
         {
           name: "Sub Categories",
           icon: <ForkKnife size={18} />,
           path: ROUTES.SUBCATEGORY,
-          permission: "categories"
+          permission: "categories",
         },
-      ]
+      ],
     },
     {
       name: "Orders",
       icon: <List size={20} />,
       path: ROUTES.ORDERS_LIST,
-      permission: "orders"
+      permission: "orders",
     },
     {
       name: "Customers",
       icon: <Users size={20} />,
       path: ROUTES.CUSTOMERS,
-      permission: "customers"
+      permission: "customers",
     },
     {
       name: "Carousel",
       icon: <WalletCards size={20} />,
       path: ROUTES.CAROUSEL,
-      permission: "carousel"
+      permission: "carousel",
     },
-    {
-      name: "Sub-Admin",
-      icon: <UserCheck size={20} />,
-      path: ROUTES.SUBADMIN,
-      permission: "subadmins"
-    },
+
     {
       name: "Coupons",
       icon: <CardSim size={20} />,
       path: ROUTES.COUPONS,
-      permission: "coupons"
+      permission: "coupons",
+    },
+    {
+      name: "Sub-Admins",
+      icon: <User2Icon size={20} />,
+      isDropdown: true,
+      permission: "subadmin",
+      subItems: [
+        {
+          name: "Subadmins",
+          icon: <UserCheck size={20} />,
+          path: ROUTES.SUBADMIN,
+          permission: "subadmins",
+        },
+        {
+          name: "Activities",
+          icon: <ChefHatIcon size={18} />,
+          path: ROUTES.SUBADMINACTIVITIES,
+          permission: "subadminactivites",
+        },
+      ],
     },
     {
       name: "Time Offers",
       icon: <Clock size={20} />,
       path: ROUTES.DEALPAGE,
-      permission: "time_offers"
+      permission: "time_offers",
     },
     {
       name: "Home Gifs",
       icon: <PercentIcon size={20} />,
       path: ROUTES.HOMEOFFER,
-      permission: "home_offers"
+      permission: "home_offers",
     },
     {
       name: "Referal",
       icon: <Coins size={20} />,
       path: ROUTES.REFERAL,
-      permission: "referral"
+      permission: "referral",
+    },
+    {
+      name: "Home Section",
+      icon: <FerrisWheel size={20} />,
+      path: ROUTES.HOMESECTION,
+      permission: "homesection",
+    },
+    {
+      name: "Combo Offer",
+      icon: <CombineIcon size={20} />,
+      path: ROUTES.COMBO_OFFER,
+      permission: "combooffer",
     },
   ];
   const footerItems = [
@@ -146,8 +176,15 @@ const Sidebar = () => {
       name: "Notifications",
       icon: <MessageCircle size={20} />,
       path: ROUTES.NOTIFICATION,
-      permission: "notifications"
+      permission: "notifications",
     },
+    {
+      name: "DeliveryFee",
+      icon: <Bike size={20} />,
+      path: ROUTES.DELIVERYFEE,
+      permission: "delivery",
+    },
+
     {
       name: "Logout",
       icon: <LogOut size={20} />,
@@ -159,37 +196,43 @@ const Sidebar = () => {
         localStorage.removeItem("adminRole");
         localStorage.removeItem("adminPermissions");
       },
-      permission: "logout"
+      permission: "logout",
     },
   ];
-  const filteredMenuItems = menuItems.filter(item =>
-    item.permission === "logout" || hasPermission(item.permission)
+  const filteredMenuItems = menuItems.filter(
+    (item) => item.permission === "logout" || hasPermission(item.permission)
   );
-  const filteredFooterItems = footerItems.filter(item =>
-    item.permission === "logout" || hasPermission(item.permission)
+  const filteredFooterItems = footerItems.filter(
+    (item) => item.permission === "logout" || hasPermission(item.permission)
   );
   const isActive = (path) => location.pathname === path;
   const isDropdownSectionActive = (subItems) => {
-    return subItems && subItems.some(subItem => isActive(subItem.path));
+    return subItems && subItems.some((subItem) => isActive(subItem.path));
   };
   const toggleDropdown = (itemName) => {
-    setOpenDropdowns(prev => ({
+    setOpenDropdowns((prev) => ({
       ...prev,
-      [itemName]: !prev[itemName]
+      [itemName]: !prev[itemName],
     }));
   };
   return (
     <div
-      className={`bg-yellow-500 shadow-md h-full ${isHovered ? "w-64" : "w-20"} flex flex-col transition-all duration-300 ease-in-out`}
+      className={`bg-yellow-500 shadow-md h-full ${
+        isHovered ? "w-64" : "w-20"
+      } flex flex-col transition-all duration-300 ease-in-out`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex items-center justify-center px-6 py-6 border-b border-gray-200">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold"><Vegan/></span>
+            <span className="text-white font-bold">
+              <Vegan />
+            </span>
           </div>
-          {isHovered && <span className="text-xl font-semibold text-white">GROCERY</span>}
+          {isHovered && (
+            <span className="text-xl font-semibold text-white">GROCERY</span>
+          )}
         </div>
       </div>
       <div className="flex-1 overflow-y-auto py-4">
@@ -200,11 +243,13 @@ const Sidebar = () => {
                 <div>
                   <button
                     onClick={() => toggleDropdown(item.name)}
-                    className={`w-full flex items-center ${isHovered ? "space-x-3 px-4" : "justify-center px-2"
-                      } py-3 rounded-md text-sm font-medium transition-colors
-                      ${isDropdownSectionActive(item.subItems)
-                        ? "bg-white text-black"
-                        : "text-black hover:bg-white"
+                    className={`w-full flex items-center ${
+                      isHovered ? "space-x-3 px-4" : "justify-center px-2"
+                    } py-3 rounded-md text-sm font-medium transition-colors
+                      ${
+                        isDropdownSectionActive(item.subItems)
+                          ? "bg-white text-black"
+                          : "text-black hover:bg-white"
                       }`}
                   >
                     {item.icon}
@@ -227,9 +272,10 @@ const Sidebar = () => {
                           key={subIndex}
                           to={subItem.path}
                           className={`flex items-center space-x-3 px-8 py-2 rounded-md text-sm transition-colors
-                            ${isActive(subItem.path)
-                              ? "bg-white text-black border-r-2 border-blue-600"
-                              : "text-black hover:bg-white"
+                            ${
+                              isActive(subItem.path)
+                                ? "bg-white text-black border-r-2 border-blue-600"
+                                : "text-black hover:bg-white"
                             }`}
                         >
                           {subItem.icon}
@@ -242,11 +288,13 @@ const Sidebar = () => {
               ) : (
                 <RouterLink
                   to={item.path}
-                  className={`flex items-center ${isHovered ? "space-x-3 px-4" : "justify-center px-2"
-                    } py-3 rounded-md text-sm font-medium transition-colors
-                    ${isActive(item.path)
-                      ? "bg-white text-black"
-                      : "text-black hover:bg-white"
+                  className={`flex items-center ${
+                    isHovered ? "space-x-3 px-4" : "justify-center px-2"
+                  } py-3 rounded-md text-sm font-medium transition-colors
+                    ${
+                      isActive(item.path)
+                        ? "bg-white text-black"
+                        : "text-black hover:bg-white"
                     }`}
                 >
                   {item.icon}
@@ -263,8 +311,9 @@ const Sidebar = () => {
             key={index}
             to={item.path}
             onClick={item.action}
-            className={`flex items-center ${isHovered ? "space-x-3 px-4" : "justify-center px-2"
-              } py-3 text-black hover:bg-white rounded-md transition`}
+            className={`flex items-center ${
+              isHovered ? "space-x-3 px-4" : "justify-center px-2"
+            } py-3 text-black hover:bg-white rounded-md transition`}
           >
             {item.icon}
             {isHovered && <span>{item.name}</span>}

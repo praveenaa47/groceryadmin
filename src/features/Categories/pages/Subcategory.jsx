@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import Button from '../../../Components/ui/Button';
-import image1 from '../../../assets/veg1.jpeg';
-import { Edit, Plus, Search, Trash2 } from 'lucide-react';
-import DeleteConfirmationModal from '../../../Components/shared/DeleteModal';
-import { AddSubcategoryModal } from '../components/Addsubcategory/AddSubcategoryModal';
-import InputField from '../../../Components/ui/InputField';
-import { EditSubcategoryModal } from '../components/EditSubcategory/EditSubcategoryModal';
-import { deleteSubCategory, getAllSubCategory } from '../api';
-import { toast, Toaster } from 'sonner';
+import React, { useState, useEffect } from "react";
+import Button from "../../../Components/ui/Button";
+import image1 from "../../../assets/veg1.jpeg";
+import { Edit, Plus, Search, Trash2 } from "lucide-react";
+import DeleteConfirmationModal from "../../../Components/shared/DeleteModal";
+import { AddSubcategoryModal } from "../components/Addsubcategory/AddSubcategoryModal";
+import InputField from "../../../Components/ui/InputField";
+import { EditSubcategoryModal } from "../components/EditSubcategory/EditSubcategoryModal";
+import { deleteSubCategory, getAllSubCategory } from "../api";
+import { toast, Toaster } from "sonner";
 
 const Subcategory = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -29,26 +29,21 @@ const Subcategory = () => {
       setLoading(true);
       setError(null);
       const response = await getAllSubCategory();
-      
-      // Fixed: Preserve the original category data for editing
       const transformedData = response.map((item, index) => ({
         id: item._id,
         image: item.image,
         name: item.name,
-        // For display
-        category: item.category ? item.category.name : 'No Category',
-        // For editing - preserve the full category object and ID
-        categoryData: item.category, // Store full category object
-        categoryId: item.category ? item.category._id : null, // Store ID separately
-        status: item.status ? 'Active' : 'Inactive',
-        // Store original item for editing
-        originalData: item
+        category: item.category ? item.category.name : "No Category",
+        categoryData: item.category,
+        categoryId: item.category ? item.category._id : null,
+        status: item.status ? "Active" : "Inactive",
+        originalData: item,
       }));
-      
+
       setSubcategories(transformedData);
     } catch (err) {
-      setError('Failed to fetch subcategories');
-      console.error('Error fetching subcategories:', err);
+      setError("Failed to fetch subcategories");
+      console.error("Error fetching subcategories:", err);
     } finally {
       setLoading(false);
     }
@@ -82,7 +77,7 @@ const Subcategory = () => {
   };
 
   const handleEdit = (item) => {
-    console.log("Editing item:", item); 
+    console.log("Editing item:", item);
     setCategoryToEdit(item);
     setIsEditModalOpen(true);
   };
@@ -92,10 +87,9 @@ const Subcategory = () => {
   };
 
   const handleSaveCategory = (categoryData) => {
-    fetchSubcategories(); 
-    console.log('New category added:', categoryData);
+    fetchSubcategories();
+    console.log("New category added:", categoryData);
   };
-
 
   return (
     <>
@@ -105,12 +99,8 @@ const Subcategory = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Sub Category
             </h1>
-            <p className="text-gray-600">Manage your product categories</p>
           </div>
-          <Button 
-            onClick={handleAddCategory}
-            icon={Plus}
-          >
+          <Button onClick={handleAddCategory} icon={Plus}>
             Add Sub Category
           </Button>
         </div>
@@ -119,7 +109,9 @@ const Subcategory = () => {
             type="text"
             placeholder="Search categories..."
             className="w-full rounded-lg pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            icon={<Search className="absolute left-3 top-2.5 text-yellow-500 w-4 h-4" />}
+            icon={
+              <Search className="absolute left-3 top-2.5 text-yellow-500 w-4 h-4" />
+            }
           />
         </div>
         <div>
@@ -135,12 +127,14 @@ const Subcategory = () => {
           {subcategories.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
               <p className="text-gray-500 text-lg">No subcategories found</p>
-              <p className="text-gray-400 text-sm mt-2">Click "Add Sub Category" to create your first subcategory</p>
             </div>
           ) : (
             <div className="space-y-4">
               {subcategories.map((item, index) => (
-                <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div
+                  key={item.id}
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+                >
                   <div className="grid grid-cols-5 gap-4 items-center">
                     <div className="text-center">
                       <span className="text-sm font-medium text-gray-700">
@@ -153,7 +147,7 @@ const Subcategory = () => {
                         alt={item.name}
                         className="w-20 h-20 rounded-lg object-cover mb-3 shadow-sm"
                         onError={(e) => {
-                          e.target.src = image1; 
+                          e.target.src = image1;
                         }}
                       />
                       <span className="text-sm font-medium text-gray-600 text-center">
@@ -166,11 +160,13 @@ const Subcategory = () => {
                       </span>
                     </div>
                     <div className="text-center">
-                      <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                        item.status === 'Active' 
-                          ? 'bg-green-500 text-white' 
-                          : 'bg-red-500 text-white'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                          item.status === "Active"
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
+                        }`}
+                      >
                         {item.status}
                       </span>
                     </div>
@@ -192,13 +188,11 @@ const Subcategory = () => {
             </div>
           )}
         </div>
-
         <AddSubcategoryModal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onSave={handleSaveCategory}
         />
-
         <EditSubcategoryModal
           isOpen={isEditModalOpen}
           onClose={() => {
@@ -206,12 +200,11 @@ const Subcategory = () => {
             setCategoryToEdit(null);
           }}
           onSave={(updatedCategory) => {
-            fetchSubcategories(); 
-            console.log('Subcategory updated:', updatedCategory);
+            fetchSubcategories();
+            console.log("Subcategory updated:", updatedCategory);
           }}
           categoryToEdit={categoryToEdit}
         />
-
         <DeleteConfirmationModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}

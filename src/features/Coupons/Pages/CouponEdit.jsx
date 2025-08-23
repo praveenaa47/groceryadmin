@@ -11,10 +11,14 @@ import {
 import { getAllCategory } from "../../Categories/api";
 import { getAllproducts } from "../../Product/api";
 import { updateCoupon } from "../api";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { ROUTES } from "../../../lib/constants";
-
 
 const CouponEdit = () => {
   const [categories, setCategories] = useState([]);
@@ -22,7 +26,7 @@ const CouponEdit = () => {
   const { id } = useParams();
   const location = useLocation();
   const coupon = location.state?.coupon;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     code: coupon?.code || "",
@@ -66,22 +70,21 @@ const CouponEdit = () => {
     });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await updateCoupon(id, formData);
-    toast.success("Coupon updated successfully!");
-    navigate(`${ROUTES.COUPONS}`)
-  } catch (err) {
-    console.error("Failed to update coupon:", err);
-    toast.error("Failed to update coupon");
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await updateCoupon(id, formData);
+      toast.success("Coupon updated successfully!");
+      navigate(`${ROUTES.COUPONS}`);
+    } catch (err) {
+      console.error("Failed to update coupon:", err);
+      toast.error("Failed to update coupon");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div>
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex justify-between items-center">
@@ -96,7 +99,6 @@ const handleSubmit = async (e) => {
         </div>
 
         <div className="space-y-6">
-          {/* Basic Info */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Tag className="w-5 h-5" />
@@ -117,14 +119,13 @@ const handleSubmit = async (e) => {
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Status
                 </label>
                 <select
                   value={formData.status}
-                                    name="status"
+                  name="status"
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
@@ -134,8 +135,6 @@ const handleSubmit = async (e) => {
               </div>
             </div>
           </div>
-
-          {/* Discount Config */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Percent className="w-5 h-5" />
@@ -149,8 +148,7 @@ const handleSubmit = async (e) => {
                 </label>
                 <select
                   value={formData.discountType}
-                                    name="discountType"
-
+                  name="discountType"
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
@@ -158,7 +156,6 @@ const handleSubmit = async (e) => {
                   <option value="fixed">Fixed Amount</option>
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Discount Value *
@@ -175,7 +172,6 @@ const handleSubmit = async (e) => {
                   />
                 </div>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Usage Limit *
@@ -192,7 +188,6 @@ const handleSubmit = async (e) => {
                   />
                 </div>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Expiry Date *
@@ -210,8 +205,6 @@ const handleSubmit = async (e) => {
               </div>
             </div>
           </div>
-
-          {/* Apply Coupon */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <ShoppingCart className="w-5 h-5" />
@@ -313,7 +306,7 @@ const handleSubmit = async (e) => {
           </div>
         </div>
       </div>
-      <Toaster position="top-right" richColors/>
+      <Toaster position="top-right" richColors />
     </div>
   );
 };

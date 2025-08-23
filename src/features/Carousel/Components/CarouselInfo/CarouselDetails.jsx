@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Camera, ChevronLeft, ChevronRight } from 'lucide-react';
-import CarouselAdd from '../../Pages/CarouselAdd';
-import { getCarouselItems, deleteCarouselItems } from '../../api';  // <-- import delete API
-import DeleteConfirmationModal from '../../../../Components/shared/DeleteModal';
-import { toast, Toaster } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { Plus, Trash2, Camera, ChevronLeft, ChevronRight } from "lucide-react";
+import CarouselAdd from "../../Pages/CarouselAdd";
+import { getCarouselItems, deleteCarouselItems } from "../../api"; 
+import DeleteConfirmationModal from "../../../../Components/shared/DeleteModal";
+import { toast, Toaster } from "sonner";
 
 const CarouselDetails = () => {
   const [carouselItems, setCarouselItems] = useState([]);
@@ -11,7 +11,7 @@ const CarouselDetails = () => {
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // <-- should be boolean
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); 
   const [carouselToDelete, setCarouselToDelete] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState({});
 
@@ -26,8 +26,8 @@ const CarouselDetails = () => {
       setCarouselItems(response);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch carousel items');
-      console.error('Error fetching carousel items:', err);
+      setError("Failed to fetch carousel items");
+      console.error("Error fetching carousel items:", err);
     } finally {
       setLoading(false);
     }
@@ -38,16 +38,13 @@ const CarouselDetails = () => {
     setShowForm(true);
   };
 
-  // open delete modal
   const handleDeleteClick = (carousel) => {
     setCarouselToDelete(carousel);
     setIsDeleteModalOpen(true);
   };
 
-  // confirm delete from modal
   const handleConfirmDelete = async () => {
     if (!carouselToDelete) return;
-
     try {
       await deleteCarouselItems(carouselToDelete._id);
       setCarouselItems((prev) =>
@@ -56,7 +53,6 @@ const CarouselDetails = () => {
       toast.success("Carousel deleted successfully!");
     } catch (error) {
       toast.error("Failed to delete carousel");
-      console.error("Delete error:", error);
     } finally {
       setIsDeleteModalOpen(false);
       setCarouselToDelete(null);
@@ -66,10 +62,15 @@ const CarouselDetails = () => {
   const handleSave = (item) => {
     if (editingItem) {
       setCarouselItems((prev) =>
-        prev.map((i) => (i._id === editingItem._id ? { ...item, _id: editingItem._id } : i))
+        prev.map((i) =>
+          i._id === editingItem._id ? { ...item, _id: editingItem._id } : i
+        )
       );
     } else {
-      setCarouselItems((prev) => [...prev, { ...item, _id: Date.now().toString() }]);
+      setCarouselItems((prev) => [
+        ...prev,
+        { ...item, _id: Date.now().toString() },
+      ]);
     }
     setShowForm(false);
   };
@@ -84,7 +85,8 @@ const CarouselDetails = () => {
   const getCurrentImageUrl = (item) => {
     const currentIndex = currentImageIndex[item._id] || 0;
     const images = [item.image, item.secondaryImage].filter(Boolean);
-    if (images.length === 0) return 'https://via.placeholder.com/400x300?text=No+Image';
+    if (images.length === 0)
+      return "https://via.placeholder.com/400x300?text=No+Image";
     return `${images[currentIndex]}`;
   };
 
@@ -103,25 +105,6 @@ const CarouselDetails = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-600 mb-4">
-            <Camera className="h-16 w-16 mx-auto mb-2" />
-            <p className="text-lg font-medium">{error}</p>
-          </div>
-          <button
-            onClick={fetchCarouselItems}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="flex justify-between items-center mb-8">
@@ -133,8 +116,6 @@ const CarouselDetails = () => {
           <Plus className="h-5 w-5 mr-2" /> Add Card
         </button>
       </div>
-
-      {/* Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {carouselItems.map((item) => (
           <div
@@ -147,8 +128,6 @@ const CarouselDetails = () => {
                 alt={item.title}
                 className="w-full h-full object-cover"
               />
-
-              {/* Image navigation for multiple images */}
               {hasMultipleImages(item) && (
                 <div className="absolute inset-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <button
@@ -165,8 +144,6 @@ const CarouselDetails = () => {
                   </button>
                 </div>
               )}
-
-              {/* Image indicator dots */}
               {hasMultipleImages(item) && (
                 <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
                   {[0, 1].map((index) => (
@@ -174,8 +151,8 @@ const CarouselDetails = () => {
                       key={index}
                       className={`w-2 h-2 rounded-full ${
                         (currentImageIndex[item._id] || 0) === index
-                          ? 'bg-white'
-                          : 'bg-white bg-opacity-50'
+                          ? "bg-white"
+                          : "bg-white bg-opacity-50"
                       }`}
                     />
                   ))}
@@ -187,11 +164,10 @@ const CarouselDetails = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate">
                 {item.title}
               </h3>
-
               {item.products && item.products.length > 0 && (
                 <p className="text-sm text-gray-600 mb-3">
                   {item.products.length} product
-                  {item.products.length !== 1 ? 's' : ''}
+                  {item.products.length !== 1 ? "s" : ""}
                 </p>
               )}
 

@@ -1,15 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Edit, RefreshCw, Trash2 } from 'lucide-react';
-import { deleteCoupon, getCoupon } from '../../api';
-import { toast, Toaster } from 'sonner';
-import DeleteConfirmationModal from '../../../../Components/shared/DeleteModal';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Edit, RefreshCw, Trash2 } from "lucide-react";
+import { deleteCoupon, getCoupon } from "../../api";
+import { toast, Toaster } from "sonner";
+import DeleteConfirmationModal from "../../../../Components/shared/DeleteModal";
+import { useNavigate } from "react-router-dom";
 
-
-const CouponInfo = ({
-  onEdit = () => {},
-  onDelete = () => {}
-}) => {
+const CouponInfo = ({ onEdit = () => {}, onDelete = () => {} }) => {
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,13 +14,13 @@ const CouponInfo = ({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const transformApiData = (apiData) => {
-    return apiData.map(coupon => ({
+    return apiData.map((coupon) => ({
       id: coupon._id,
       code: coupon.code,
       discountType: coupon.discountType,
       discountValue: coupon.discountValue,
-      minAmount: 0, 
-      maxDiscount: null, 
+      minAmount: 0,
+      maxDiscount: null,
       expiryDate: coupon.expiryDate,
       status: coupon.status,
       usageCount: coupon.usedCount,
@@ -33,13 +29,14 @@ const CouponInfo = ({
       applicableProducts: coupon.applicableProducts,
       applicableCategories: coupon.applicableCategories,
       createdAt: coupon.createdAt,
-      updatedAt: coupon.updatedAt
+      updatedAt: coupon.updatedAt,
     }));
   };
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleEdit = (coupon) => {
-navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
+    navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });
+  };
   const fetchCoupons = async () => {
     try {
       setLoading(true);
@@ -53,9 +50,9 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
       const transformedData = transformApiData(dataArray);
       setCoupons(transformedData);
     } catch (err) {
-      console.error('Error fetching coupons:', err);
-      setError('Failed to load coupons. Please try again.');
-      toast.error('Failed to load coupons. Please try again.');
+      console.error("Error fetching coupons:", err);
+      setError("Failed to load coupons. Please try again.");
+      toast.error("Failed to load coupons. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -75,28 +72,17 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
 
     try {
       setIsDeleting(true);
-      
-      // Call the delete API
       await deleteCoupon(couponToDelete.id);
-      
-      // Update local state by removing the deleted coupon
-      setCoupons(prevCoupons => 
-        prevCoupons.filter(coupon => coupon.id !== couponToDelete.id)
+      setCoupons((prevCoupons) =>
+        prevCoupons.filter((coupon) => coupon.id !== couponToDelete.id)
       );
-      
-      // Call the onDelete callback
       onDelete(couponToDelete);
-      
-      // Show success message
-      toast.success('Coupon deleted successfully');
-      
-      // Close modal and reset state
+      toast.success("Coupon deleted successfully");
       setIsDeleteModalOpen(false);
       setCouponToDelete(null);
-      
     } catch (error) {
-      console.error('Error deleting coupon:', error);
-      toast.error('Failed to delete coupon. Please try again.');
+      console.error("Error deleting coupon:", error);
+      toast.error("Failed to delete coupon. Please try again.");
     } finally {
       setIsDeleting(false);
     }
@@ -111,24 +97,28 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
 
   const getStatusBadge = (status) => {
     const statusClasses = {
-      active: 'bg-green-100 text-green-800',
-      inactive: 'bg-yellow-100 text-yellow-800',
-      expired: 'bg-red-100 text-red-800'
+      active: "bg-green-100 text-green-800",
+      inactive: "bg-yellow-100 text-yellow-800",
+      expired: "bg-red-100 text-red-800",
     };
-    
+
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusClasses[status] || 'bg-gray-100 text-gray-800'}`}>
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          statusClasses[status] || "bg-gray-100 text-gray-800"
+        }`}
+      >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
 
   const formatDiscount = (type, value) => {
-    return type === 'percentage' ? `${value}%` : `₹${value}`;
+    return type === "percentage" ? `${value}%` : `₹${value}`;
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-IN');
+    return new Date(dateString).toLocaleDateString("en-IN");
   };
 
   if (loading) {
@@ -148,9 +138,7 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
     <div className="p-6">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {coupons.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No coupons found.
-          </div>
+          <div className="p-8 text-center text-gray-500">No coupons found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -183,11 +171,16 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
                 {coupons.map((coupon) => (
                   <tr key={coupon.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{coupon.code}</div>
+                      <div className="font-medium text-gray-900">
+                        {coupon.code}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {formatDiscount(coupon.discountType, coupon.discountValue)}
+                        {formatDiscount(
+                          coupon.discountType,
+                          coupon.discountValue
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -195,7 +188,12 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
                         {coupon.usageCount}/{coupon.usageLimit}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {Math.round(((coupon.usageLimit - coupon.usageCount) / coupon.usageLimit) * 100)}% remaining
+                        {Math.round(
+                          ((coupon.usageLimit - coupon.usageCount) /
+                            coupon.usageLimit) *
+                            100
+                        )}
+                        % remaining
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -208,11 +206,12 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
                       <div className="text-sm text-gray-900 capitalize">
                         {coupon.applicationType}
                       </div>
-                      {coupon.applicableProducts && coupon.applicableProducts.length > 0 && (
-                        <div className="text-xs text-gray-500">
-                          {coupon.applicableProducts.length} product(s)
-                        </div>
-                      )}
+                      {coupon.applicableProducts &&
+                        coupon.applicableProducts.length > 0 && (
+                          <div className="text-xs text-gray-500">
+                            {coupon.applicableProducts.length} product(s)
+                          </div>
+                        )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
@@ -241,7 +240,7 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
           </div>
         )}
       </div>
-      
+
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={handleCloseDeleteModal}
@@ -249,8 +248,8 @@ navigate(`/admin/coupons/edit/${coupon.id}`, { state: { coupon } });  };
         itemName={`coupon "${couponToDelete?.code}"`}
         isLoading={isDeleting}
       />
-      
-      <Toaster position='top-right' richColors />
+
+      <Toaster position="top-right" richColors />
     </div>
   );
 };

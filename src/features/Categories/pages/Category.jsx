@@ -110,7 +110,6 @@ const Category = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Category</h1>
-            <p className="text-gray-600">Manage your product categories</p>
           </div>
           <Button onClick={handleAddCategory} icon={PlusIcon}>
             Add Category
@@ -139,7 +138,6 @@ const Category = () => {
             <div>ACTION</div>
           </div>
         </div>
-
         <div className="space-y-4">
           {filteredCategories.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
@@ -207,14 +205,12 @@ const Category = () => {
           onClose={() => setIsAddModalOpen(false)}
           onSave={handleSaveCategory}
         />
-
         <EditCategoryModal
-           isOpen={isEditModalOpen}
+          isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}
           onSave={handleSaveCategory}
           categoryToEdit={categoryToEdit}
         />
-
         <DeleteConfirmationModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}

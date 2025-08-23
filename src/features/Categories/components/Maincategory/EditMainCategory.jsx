@@ -3,7 +3,6 @@ import { X, Upload, Camera, Palette } from "lucide-react";
 import { ChromePicker } from "react-color";
 import { BASE_URL } from "../../../../lib/constants";
 
-
 export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -27,7 +26,7 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-    useEffect(() => {
+  useEffect(() => {
     if (initialData) {
       setFormData({
         name: initialData.name || "",
@@ -37,9 +36,7 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
         secondaryColor: initialData.secondaryColor || "",
       });
       setImagePreview(
-        initialData.image
-          ? `${BASE_URL}/uploads/${initialData.image}`
-          : ""
+        initialData.image ? `${BASE_URL}/uploads/${initialData.image}` : ""
       );
     }
   }, [initialData]);
@@ -47,10 +44,10 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({ 
-        ...prev, 
+      setFormData((prev) => ({
+        ...prev,
         imageFile: file,
-        image: "" 
+        image: "",
       }));
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -72,7 +69,7 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
 
   const handleColorInputChange = (colorType, value) => {
     const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-    if (hexPattern.test(value) || value === '') {
+    if (hexPattern.test(value) || value === "") {
       setFormData((prev) => ({
         ...prev,
         [colorType]: value,
@@ -103,12 +100,12 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
   };
 
   const handleClose = () => {
-    setFormData({ 
-      name: "", 
-      image: "", 
+    setFormData({
+      name: "",
+      image: "",
       imageFile: null,
-      primaryColor: "", 
-      secondaryColor: "" 
+      primaryColor: "",
+      secondaryColor: "",
     });
     setImagePreview("");
     setErrors({});
@@ -121,16 +118,12 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
       <div
         className="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity"
         onClick={handleClose}
       ></div>
-
-      {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
         <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all">
-          {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
               Edit main category
@@ -142,9 +135,7 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
-
           <div className="p-4 sm:p-6">
-            {/* Category Name */}
             <div className="mb-6">
               <label
                 htmlFor="name"
@@ -167,8 +158,6 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
               )}
             </div>
-
-            {/* Category Image */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category Image *
@@ -211,14 +200,10 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
                 <p className="mt-2 text-sm text-red-600">{errors.icon}</p>
               )}
             </div>
-
-            {/* Color Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-4">
                 Category Colors
               </label>
-              
-              {/* Primary Color */}
               <div className="mb-4">
                 <label className="block text-xs font-medium text-gray-600 mb-2">
                   Primary Color
@@ -236,7 +221,9 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
                     <input
                       type="text"
                       value={formData.primaryColor}
-                      onChange={(e) => handleColorInputChange('primaryColor', e.target.value)}
+                      onChange={(e) =>
+                        handleColorInputChange("primaryColor", e.target.value)
+                      }
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors text-sm font-mono"
                       placeholder="#d19f17"
                     />
@@ -251,20 +238,19 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
                       <Palette className="w-4 h-4 text-gray-500" />
                     </button>
                   </div>
-                  
                   {showPrimaryPicker && (
                     <div className="absolute top-12 left-0 z-10 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
                       <ChromePicker
                         color={formData.primaryColor}
-                        onChange={(color) => handleColorChange('primaryColor', color)}
+                        onChange={(color) =>
+                          handleColorChange("primaryColor", color)
+                        }
                         disableAlpha={true}
                       />
                     </div>
                   )}
                 </div>
               </div>
-
-              {/* Secondary Color */}
               <div className="mb-4">
                 <label className="block text-xs font-medium text-gray-600 mb-2">
                   Secondary Color
@@ -282,7 +268,9 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
                     <input
                       type="text"
                       value={formData.secondaryColor}
-                      onChange={(e) => handleColorInputChange('secondaryColor', e.target.value)}
+                      onChange={(e) =>
+                        handleColorInputChange("secondaryColor", e.target.value)
+                      }
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors text-sm font-mono"
                       placeholder="#dedad1"
                     />
@@ -297,32 +285,32 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
                       <Palette className="w-4 h-4 text-gray-500" />
                     </button>
                   </div>
-                  
+
                   {showSecondaryPicker && (
                     <div className="absolute top-12 left-0 z-10 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
                       <ChromePicker
                         color={formData.secondaryColor}
-                        onChange={(color) => handleColorChange('secondaryColor', color)}
+                        onChange={(color) =>
+                          handleColorChange("secondaryColor", color)
+                        }
                         disableAlpha={true}
                       />
                     </div>
                   )}
                 </div>
               </div>
-
-              {/* Color Preview */}
               <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50">
                 <p className="text-xs text-gray-600 mb-2">Color Preview:</p>
                 <div className="flex gap-2">
                   <div className="flex-1 text-center">
-                    <div 
+                    <div
                       className="w-full h-8 rounded-md border border-gray-300"
                       style={{ backgroundColor: formData.primaryColor }}
                     ></div>
                     <p className="text-xs text-gray-500 mt-1">Primary</p>
                   </div>
                   <div className="flex-1 text-center">
-                    <div 
+                    <div
                       className="w-full h-8 rounded-md border border-gray-300"
                       style={{ backgroundColor: formData.secondaryColor }}
                     ></div>
@@ -331,8 +319,6 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
                 </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <button
                 type="button"
@@ -352,9 +338,8 @@ export function EditMainCategory({ isOpen, onClose, onSave, initialData }) {
           </div>
         </div>
       </div>
-
       {(showPrimaryPicker || showSecondaryPicker) && (
-        <div 
+        <div
           className="fixed inset-0 z-5"
           onClick={() => {
             setShowPrimaryPicker(false);

@@ -2,14 +2,23 @@ import React, { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { updateSubadmin } from "../api";
 import { toast, Toaster } from "sonner";
-import { Shield, Eye, EyeOff, ChevronDown, Check, Save, ArrowLeft, X } from "lucide-react";
+import {
+  Shield,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  Check,
+  Save,
+  ArrowLeft,
+  X,
+} from "lucide-react";
 
 const EditSubadmin = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { state } = useLocation(); 
+  const { state } = useLocation();
 
-  const subadmin = state?.subadmin || {}; 
+  const subadmin = state?.subadmin || {};
 
   const [name, setName] = useState(subadmin.name || "");
   const [email, setEmail] = useState(subadmin.email || "");
@@ -73,7 +82,6 @@ const EditSubadmin = () => {
       </div>
 
       <div className="bg-white shadow rounded p-6 space-y-4">
-        {/* Name */}
         <input
           type="text"
           value={name}
@@ -82,7 +90,6 @@ const EditSubadmin = () => {
           className="w-full border px-3 py-2 rounded"
         />
 
-        {/* Email */}
         <input
           type="email"
           value={email}
@@ -91,7 +98,6 @@ const EditSubadmin = () => {
           className="w-full border px-3 py-2 rounded"
         />
 
-        {/* Password */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -175,7 +181,13 @@ const EditSubadmin = () => {
               : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {isSubmitting ? "Saving..." : <><Save size={18} /> Save Changes</>}
+          {isSubmitting ? (
+            "Saving..."
+          ) : (
+            <>
+              <Save size={18} /> Save Changes
+            </>
+          )}
         </button>
       </div>
       <Toaster position="top-right" richColors />

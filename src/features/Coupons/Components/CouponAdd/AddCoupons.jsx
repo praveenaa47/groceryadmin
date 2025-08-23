@@ -213,20 +213,14 @@ const AddCoupons = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       return;
     }
-
     setIsSubmitting(true);
     setSubmitMessage({ type: "", text: "" });
-
     try {
       const payload = prepareAPIPayload();
-      console.log("Sending coupon data:", payload);
-
       const response = await createCoupon(payload);
-
       if (response && response.coupon) {
         toast.success("successfully created ");
         navigate(`${ROUTES.COUPONS}`);
@@ -286,7 +280,6 @@ const AddCoupons = ({
     }
   };
 
-  // Loading state
   if (isLoadingData) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
@@ -303,7 +296,6 @@ const AddCoupons = ({
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div>
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex justify-between items-center">
@@ -318,8 +310,6 @@ const AddCoupons = ({
             </div>
           </div>
         </div>
-
-        {/* Data Error Message */}
         {dataError && (
           <div className="mb-6 p-4 rounded-lg border bg-yellow-50 border-yellow-200">
             <div className="flex items-center gap-2 mb-2">
@@ -335,8 +325,6 @@ const AddCoupons = ({
             </button>
           </div>
         )}
-
-        {/* Success/Error Messages */}
         {submitMessage.text && (
           <div
             className={`mb-6 p-4 rounded-lg border ${

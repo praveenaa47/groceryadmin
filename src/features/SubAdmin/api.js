@@ -3,15 +3,11 @@ import { API_ENDPOINTS } from "../../lib/constants";
 
 export const addSubadmin = async (reqBody) => {
   try {
-    const response = await axios.post(
-      `${API_ENDPOINTS.SUBADMIN}/`,
-      reqBody,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_ENDPOINTS.SUBADMIN}/`, reqBody, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to add subadmin");
@@ -21,11 +17,7 @@ export const addSubadmin = async (reqBody) => {
 
 export const viewSubadmin = async (reqBody) => {
   try {
-    const response = await axios.get(
-      `${API_ENDPOINTS.SUBADMIN}`,
-      reqBody,
-      {}
-    );
+    const response = await axios.get(`${API_ENDPOINTS.SUBADMIN}`, reqBody, {});
     return response.data;
   } catch (error) {
     console.error("Failed to get subadmin");
@@ -52,11 +44,44 @@ export const updateSubadmin = async (reqBody, id) => {
 
 export const deleteSubadmin = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API_ENDPOINTS.SUBADMIN}/${id}`,{});
+    const response = await axios.delete(`${API_ENDPOINTS.SUBADMIN}/${id}`, {});
     return response.data;
   } catch (error) {
     console.error("Failed to delete subadmin");
+    throw error;
+  }
+};
+
+// activities api
+
+export const viewSubadminActivity = async () => {
+  const token = localStorage.getItem("adminToken");
+  try {
+    const response = await axios.get(`${API_ENDPOINTS.SUBADMINACTIVITIES}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to view activity");
+    throw error;
+  }
+};
+export const viewbyIdSubadminActivity = async (id) => {
+  const token = localStorage.getItem("adminToken");
+  try {
+    const response = await axios.get(
+      `${API_ENDPOINTS.SUBADMINACTIVITIES}/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to view activity");
     throw error;
   }
 };
