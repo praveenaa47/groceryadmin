@@ -8,6 +8,7 @@ import InputField from "../../../Components/ui/InputField";
 import { EditSubcategoryModal } from "../components/EditSubcategory/EditSubcategoryModal";
 import { deleteSubCategory, getAllSubCategory } from "../api";
 import { toast, Toaster } from "sonner";
+import { IMG_URL } from "../../../lib/constants";
 
 const Subcategory = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -143,7 +144,7 @@ const Subcategory = () => {
                     </div>
                     <div className="flex flex-col items-center">
                       <img
-                        src={item.image}
+                        src={`${IMG_URL}/${item.image}`}
                         alt={item.name}
                         className="w-20 h-20 rounded-lg object-cover mb-3 shadow-sm"
                         onError={(e) => {

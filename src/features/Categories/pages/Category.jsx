@@ -15,6 +15,7 @@ import InputField from "../../../Components/ui/InputField";
 import { EditCategoryModal } from "../components/EditCategory/EditCategoryModal";
 import { deleteCategory, getAllCategory, updateCategory } from "../api";
 import { toast, Toaster } from "sonner";
+import { IMG_URL } from "../../../lib/constants";
 
 const Category = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -157,7 +158,7 @@ const Category = () => {
                   <div className="text-center">{index + 1}</div>
                   <div className="flex flex-col items-center">
                     <img
-                      src={item.image || "https://via.placeholder.com/150"}
+                      src={`${IMG_URL}/${item.image}`}
                       alt={item.name}
                       className="w-20 h-20 rounded-lg object-cover mb-3"
                       onError={(e) => {

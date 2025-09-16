@@ -4,6 +4,7 @@ import CarouselAdd from "../../Pages/CarouselAdd";
 import { getCarouselItems, deleteCarouselItems } from "../../api"; 
 import DeleteConfirmationModal from "../../../../Components/shared/DeleteModal";
 import { toast, Toaster } from "sonner";
+import { IMG_URL } from "../../../../lib/constants";
 
 const CarouselDetails = () => {
   const [carouselItems, setCarouselItems] = useState([]);
@@ -83,12 +84,13 @@ const CarouselDetails = () => {
   };
 
   const getCurrentImageUrl = (item) => {
-    const currentIndex = currentImageIndex[item._id] || 0;
-    const images = [item.image, item.secondaryImage].filter(Boolean);
-    if (images.length === 0)
-      return "https://via.placeholder.com/400x300?text=No+Image";
-    return `${images[currentIndex]}`;
-  };
+  const currentIndex = currentImageIndex[item._id] || 0;
+  const images = [item.image, item.secondaryImage].filter(Boolean);
+  if (images.length === 0)
+    return "https://via.placeholder.com/400x300?text=No+Image";
+  return `${IMG_URL}/${images[currentIndex]}`;
+};
+
 
   const hasMultipleImages = (item) => {
     return item.image && item.secondaryImage;

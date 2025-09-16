@@ -130,7 +130,7 @@ export function AddModal({ isOpen, onClose, onSave }) {
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Category Name *
+                Main Category Name *
               </label>
               <input
                 type="text"
@@ -314,7 +314,7 @@ export function AddModal({ isOpen, onClose, onSave }) {
                 onClick={handleSubmit}
                 className="w-full sm:flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors font-medium"
               >
-                Add Category
+                Add Main Category
               </button>
             </div>
           </div>

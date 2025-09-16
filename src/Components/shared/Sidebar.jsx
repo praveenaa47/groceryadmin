@@ -3,36 +3,23 @@ import { Link as RouterLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   LogOut,
-  Building2,
   ChevronDown,
   ChevronRight,
-  Building2Icon,
-  GraduationCap,
-  Library,
   BoxIcon,
-  FolderOpenDot,
-  FolderTree,
-  IterationCcw,
   TorusIcon,
   ChefHatIcon,
   ForkKnife,
   Vegan,
   Grid2X2XIcon,
   List,
-  Group,
   User2Icon,
-  LucideGroup,
   Users,
   CardSim,
-  PersonStanding,
   WalletCards,
   Clock,
   PercentIcon,
   UserCheck,
-  GitCompareArrows,
   Coins,
-  CoinsIcon,
-  CodeIcon,
   MessageCircle,
   Bike,
   FerrisWheel,
@@ -264,7 +251,6 @@ const Sidebar = () => {
                       </>
                     )}
                   </button>
-                  {/* Dropdown Items */}
                   {isHovered && openDropdowns[item.name] && (
                     <div className="mt-1 space-y-1">
                       {item.subItems.map((subItem, subIndex) => (

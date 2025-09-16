@@ -4,6 +4,7 @@ import DeleteConfirmationModal from "../../../../Components/shared/DeleteModal";
 import { useNavigate } from "react-router-dom";
 import { deleteproduct, getAllproducts } from "../../api";
 import { toast, Toaster } from "sonner";
+import { IMG_URL } from "../../../../lib/constants";
 
 
 
@@ -42,7 +43,7 @@ const ProductTable = () => {
 
   const getImageUrl = (images) => {
     if (images && images.length > 0) {
-      return `${'http://localhost:5000'}/uploads/${images[0]}`;
+      return `${IMG_URL}/${images[0]}`;
     }
     return "https://via.placeholder.com/80x80";
   };

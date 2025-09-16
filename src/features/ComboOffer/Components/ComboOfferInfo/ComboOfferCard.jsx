@@ -1,5 +1,5 @@
-// components/ComboOfferCard.jsx
 import { Edit2, Trash2 } from "lucide-react";
+import { IMG_URL } from "../../../../lib/constants";
 
 const ComboOfferCard = ({ combo, onEdit, onDelete }) => {
   const formatDate = (dateString) => {
@@ -16,10 +16,7 @@ const ComboOfferCard = ({ combo, onEdit, onDelete }) => {
     <div className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow">
       <div className="relative">
         <img
-          src={
-            combo.image ||
-            "https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=200&fit=crop"
-          }
+          src={`${IMG_URL}/${combo.image}`}
           alt={combo.name}
           className="w-full h-48 object-cover rounded-t-xl"
           onError={(e) => {

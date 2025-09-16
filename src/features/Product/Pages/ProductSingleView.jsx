@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useParams,useNavigate } from "react-router-dom";
 import { viewbyIdproduct } from "../api";
+import { IMG_URL } from "../../../lib/constants";
 
 function ProductSingleView() {
   const [selectedImage, setSelectedImage] = useState(0);
@@ -63,7 +64,7 @@ const handleButton = () => {
   }
 
   const imageBaseUrl =  ""; 
-  const productImages = product.images?.map(img => `${imageBaseUrl}/${img}`) || [];
+  const productImages = product.images?.map(img => `${IMG_URL}/${img}`) || [];
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -14,7 +14,6 @@ const OrderView = () => {
   const { orderId } = useParams(); 
   const navigate = useNavigate();
 
-  // Available status options
   const statusOptions = [
     { value: 'pending', label: 'Pending' },
     { value: 'processing', label: 'Processing' },
@@ -30,7 +29,6 @@ const OrderView = () => {
         setLoading(false);
         return;
       }
-
       try {
         setLoading(true);
         const data = await getAllOrdersbyId(orderId);
@@ -51,17 +49,14 @@ const OrderView = () => {
   const handleGoBack = () => {
     navigate(-1); 
   };
-
   const handleEditStatus = () => {
     setIsEditingStatus(true);
     setSelectedStatus(orderData.status);
   };
-
   const handleCancelEdit = () => {
     setIsEditingStatus(false);
     setSelectedStatus(orderData.status);
   };
-
   const handleUpdateStatus = async () => {
     if (selectedStatus === orderData.status) {
       setIsEditingStatus(false);
@@ -70,14 +65,7 @@ const OrderView = () => {
 
     try {
       setUpdatingStatus(true);
-      
-      // Add your API call here to update the order status
-      // Example: await updateOrderStatus(orderId, selectedStatus);
-      
-      // For now, we'll simulate the API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update local state
       setOrderData(prev => ({ ...prev, status: selectedStatus }));
       setIsEditingStatus(false);
       toast.success('Order status updated successfully');
@@ -85,7 +73,7 @@ const OrderView = () => {
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error('Failed to update order status');
-      setSelectedStatus(orderData.status); // Reset to original status
+      setSelectedStatus(orderData.status); 
     } finally {
       setUpdatingStatus(false);
     }
@@ -139,7 +127,6 @@ const OrderView = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div >
@@ -159,7 +146,6 @@ const OrderView = () => {
               <p className="text-gray-600">Order ID: <span className="font-mono text-sm">{orderData._id}</span></p>
             </div>
             <div className="flex flex-col md:flex-row gap-2 mt-4 md:mt-0">
-              {/* Status with Edit Functionality */}
               <div className="flex items-center gap-2">
                 {isEditingStatus ? (
                   <div className="flex items-center gap-2">
@@ -211,15 +197,12 @@ const OrderView = () => {
                   </div>
                 )}
               </div>
-              
-              {/* Payment Status */}
               <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getPaymentStatusColor(orderData.paymentStatus)}`}>
                 Payment {orderData.paymentStatus.charAt(0).toUpperCase() + orderData.paymentStatus.slice(1)}
               </span>
             </div>
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center mb-4">
@@ -231,7 +214,6 @@ const OrderView = () => {
               <p><span className="font-medium text-gray-700">Customer ID:</span> <span className="font-mono text-sm">{orderData.user._id}</span></p>
             </div>
           </div>
-
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center mb-4">
               <MapPin className="h-5 w-5 text-green-600 mr-2" />
@@ -248,7 +230,6 @@ const OrderView = () => {
               </p>
             </div>
           </div>
-
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center mb-4">
               <CreditCard className="h-5 w-5 text-purple-600 mr-2" />
@@ -263,8 +244,6 @@ const OrderView = () => {
               </p>
             </div>
           </div>
-
-          {/* Order Timeline */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center mb-4">
               <Calendar className="h-5 w-5 text-indigo-600 mr-2" />
@@ -276,14 +255,11 @@ const OrderView = () => {
             </div>
           </div>
         </div>
-
-        {/* Order Items */}
         <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
           <div className="flex items-center mb-4">
             <Package className="h-5 w-5 text-orange-600 mr-2" />
             <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
           </div>
-          
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -315,14 +291,11 @@ const OrderView = () => {
             </table>
           </div>
         </div>
-
-        {/* Order Summary */}
         <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
           <div className="flex items-center mb-4">
             <Truck className="h-5 w-5 text-red-600 mr-2" />
             <h2 className="text-lg font-semibold text-gray-900">Order Summary</h2>
           </div>
-          
           <div className="space-y-2 max-w-md ml-auto">
             <div className="flex justify-between">
               <span className="text-gray-700">Subtotal:</span>
@@ -331,12 +304,12 @@ const OrderView = () => {
             {orderData.totalDiscount > 0 && (
               <div className="flex justify-between text-green-600">
                 <span>Discount:</span>
-                <span>-₹{orderData.totalDiscount.toLocaleString()}</span>
+                <span>-₹{orderData?.totalDiscount?.toLocaleString()}</span>
               </div>
             )}
             <div className="border-t pt-2 flex justify-between font-semibold text-lg">
               <span>Total:</span>
-              <span>₹{orderData.totalPrice.toLocaleString()}</span>
+              <span>₹{orderData?.totalPrice?.toLocaleString()}</span>
             </div>
           </div>
         </div>

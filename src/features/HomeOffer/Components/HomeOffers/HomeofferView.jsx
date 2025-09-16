@@ -16,6 +16,7 @@ import { deleteHomeoffer, getHomeoffer } from "../../api";
 import { useNavigate } from "react-router-dom";
 import DeleteConfirmationModal from "../../../../Components/shared/DeleteModal";
 import { toast, Toaster } from "sonner";
+import { IMG_URL } from "../../../../lib/constants";
 
 
 const HomeOfferView = () => {
@@ -96,7 +97,7 @@ const handleDeleteClick = (offer) => {
     if (imagePath.startsWith("http")) {
       return imagePath;
     }
-    return `https://your-api-base-url${imagePath}`;
+    return `${IMG_URL}/${imagePath}`;
   };
 
   if (loading) {

@@ -4,6 +4,7 @@ import { deleteDeal, getallDeal } from "../../api";
 import { useNavigate } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import DeleteConfirmationModal from "../../../../Components/shared/DeleteModal";
+import { IMG_URL } from "../../../../lib/constants";
 
 const DealList = () => {
   const [deals, setDeals] = useState([]);
@@ -148,7 +149,7 @@ const DealList = () => {
                 {deal.image && (
                   <div className="h-48 bg-gray-100">
                     <img
-                      src={deal.image}
+                      src={`${IMG_URL}/${deal.image}`}
                       alt={deal.productName}
                       className="w-full h-full object-cover"
                       // onError={(e) => {

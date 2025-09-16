@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Search, Bell, X, LogIn, ChevronDown } from 'lucide-react';
+import { Menu, Search, } from 'lucide-react';
 const Header = () => {
   return (
     <header className="bg-white border-b border-gray-200 flex items-center justify-between p-4 relative">
@@ -23,13 +23,12 @@ const Header = () => {
       </div>
       <div className="flex items-center space-x-4">
         {/* Notification Bell */}
-        <button className="relative p-2 text-black bg-white rounded-lg cursor-pointer hover:bg-yellow-500 transition-colors">
+        {/* <button className="relative p-2 text-black bg-white rounded-lg cursor-pointer hover:bg-yellow-500 transition-colors">
           <Bell size={20} />
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
             3
           </span>
-        </button>
-        {/* Profile Section */}
+        </button> */}
         <div className="flex items-center cursor-pointer  rounded-lg p-1 transition-colors">
           <div className="mr-2 text-right hidden sm:block">
             <p className="text-sm font-medium">Admin</p>

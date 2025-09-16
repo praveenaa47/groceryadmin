@@ -11,6 +11,7 @@ import {
 import { toast, Toaster } from "sonner";
 import DeleteConfirmationModal from "../../../Components/shared/DeleteModal";
 import { EditMainCategory } from "../components/Maincategory/EditMainCategory";
+import { IMG_URL } from "../../../lib/constants";
 
 function Button({ onClick, icon: Icon, children, className = "" }) {
   return (
@@ -297,7 +298,7 @@ export default function MainCategory() {
                       <img
                         src={
                           category.image
-                            ? `${BASE_URL}/uploads/${category.image}`
+                            ? `${IMG_URL}/${category.image}`
                             : `https://via.placeholder.com/100x100/f3f4f6/6b7280?text=${
                                 category.name?.charAt(0) || ""
                               }`

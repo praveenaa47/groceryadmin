@@ -20,7 +20,7 @@ function CustomerTable() {
   const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false); // Added missing state
+  const [isDeleting, setIsDeleting] = useState(false); 
 
   const navigate = useNavigate();
 
@@ -47,7 +47,6 @@ function CustomerTable() {
     }
   };
 
-  // Fixed: Pass customer object instead of undefined 'category'
   const handleDeleteClick = (customer) => {
     setCustomerToDelete(customer);
     setIsDeleteModalOpen(true);
@@ -59,11 +58,9 @@ function CustomerTable() {
     setIsDeleting(true);
     try {
       const response = await deleteCustomer(customerToDelete.userId);
-      // Fixed: Filter by userId instead of undefined property
       setCustomers((prev) =>
         prev.filter((customer) => customer.userId !== customerToDelete.userId)
       );
-      // Fixed: Update filtered customers as well
       setFilteredCustomers((prev) =>
         prev.filter((customer) => customer.userId !== customerToDelete.userId)
       );
@@ -72,7 +69,6 @@ function CustomerTable() {
       const errorMessage =
         error.response?.data?.message || "Failed to delete customer";
       toast.error(errorMessage);
-      // Removed fetchSubcategories() call as it's not relevant here
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);

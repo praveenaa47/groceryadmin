@@ -56,3 +56,5 @@ export const API_ENDPOINTS = {
   COMBO_CATEGORY: `${BASE_URL}/admin/combo-category`,
   SUBADMINACTIVITIES: `${BASE_URL}/admin/activity-log`,
 };
+
+export const IMG_URL = "https://res.cloudinary.com/dlsgn8tnx/image/upload";
