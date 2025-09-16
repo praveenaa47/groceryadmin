@@ -46,63 +46,67 @@ export function AddCategoryModal({ isOpen, onClose, onSave }) {
   };
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size should be less than 5MB");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageUrl = event.target.result;
-        setFormData((prev) => ({ ...prev, image: imageUrl }));
-        setImagePreview(imageUrl);
-      };
-      reader.onerror = () => {
-        toast.error("Failed to read image file");
-      };
-      reader.readAsDataURL(file);
+  const file = e.target.files[0];
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
     }
-  };
+
+    // Store raw file for upload
+    setFormData((prev) => ({ ...prev, image: file }));
+
+    // Generate preview only
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImagePreview(event.target.result); // preview only
+    };
+    reader.readAsDataURL(file);
+  }
+};
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.mainCategory.trim()) {
-      newErrors.mainCategory = "Main category name is required";
-    }
-    if (!formData.name.trim()) {
-      newErrors.name = "Category name is required";
-    }
-    if (!formData.image.trim()) {
-      newErrors.image = "Category image is required";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const newErrors = {};
+  if (!formData.mainCategory) {
+    newErrors.mainCategory = "Main category name is required";
+  }
+  if (!formData.name.trim()) {
+    newErrors.name = "Category name is required";
+  }
+  if (!formData.image) {
+    newErrors.image = "Category image is required";
+  }
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   const handleSubmit = async () => {
-    if (validateForm()) {
-      setIsLoading(true);
-      try {
-        const formDataToSend = new FormData();
-        formDataToSend.append("mainCategory", formData.mainCategory);
-        formDataToSend.append("name", formData.name);
-        formDataToSend.append("image", formData.image);
-        const response = await addCategory(formDataToSend);
-        toast.success("Category created successfully");
-        if (onSave && response.category) {
-          onSave(response.category);
-        }
-        handleClose();
-      } catch (error) {
-        console.error("Error adding category:", error);
-        toast.error(error.response?.data?.message || "Error adding category");
-      } finally {
-        setIsLoading(false);
+  if (validateForm()) {
+    setIsLoading(true);
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("mainCategory", formData.mainCategory);
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("image", formData.image, formData.image.name);
+
+      const response = await addCategory(formDataToSend);
+
+      toast.success("Category created successfully");
+
+      if (onSave && (response.category || response.data)) {
+        onSave(response.category || response.data);
       }
+      handleClose();
+    } catch (error) {
+      console.error("Error adding category:", error);
+      toast.error(error.response?.data?.message || "Error adding category");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
+};
+
 
   const handleClose = () => {
     setFormData({ mainCategory: "", name: "", image: "" });
